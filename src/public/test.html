@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/res/css/bootstrap.css">
+	<link rel="stylesheet" href="/res/css/bootstrap-theme.css">
+	<link rel="stylesheet" href="/res/css/opwifi.css">
+</head>
+<body>
+	<div id="owwrap">
+		<div id="adminmenuback"></div>
+		<div id="adminmenuwrap">
+<ul id="adminmenu" role="navigation" class="dropdown-hover">
+	<li id="menu-dashboard" class="dropdown" >
+	<a id="ml-dashboard" href="index.php" class="menu-top" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	<div class="ow-menu-arrow"><div></div></div>
+	<div class="ow-menu-icon menuicons-before"><span class="glyphicon glyphicon-home" aria-hidden="true"></span></div>
+	<div class="ow-menu-name">仪表盘</div>
+	</a>
+	<ul class="dropdown-menu dropdown-menu-left ow-submenu" aria-labelledby="ml-dashboard">
+	<li class="ow-submenu-head">仪表盘</li>
+	<li class="ow-first-item"><a href="index.php" class="ow-first-item">首页</a></li>
+	<li><a href="update-core.php">更新<span class="update-plugins count-6" title="1个WordPress更新, 2个插件更新, 3个主题更新"><span class="badge">6</span></span></a></li>
+	</ul>
+	</li>
+
+	<li class="wp-not-current-submenu wp-menu-separator" aria-hidden="true"><div class="separator"></div></li>
+
+	<li id="menu-comments" class="dropdown">
+	<a href="edit-comments.php" class="menu-top">
+	<div class="ow-menu-arrow"><div></div></div>
+	<div class="ow-menu-icon dashicons-before dashicons-admin-comments"><br></div>
+	<div class="ow-menu-name">评论<span class="badge"></span></div>
+	</a>
+	</li>
+
+	<li id="menu-plugins" class="dropdown current">
+	<a id="ml-plugins" href="plugins.php" class="menu-top" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	<div class="ow-menu-arrow"><div></div></div>
+	<div class="ow-menu-icon dashicons-before dashicons-admin-plugins"><br></div>
+	<div class="ow-menu-name">插件<span class="update-plugins count-2"><span class="badge">2</span></span></div>
+	</a>
+	<ul class="ow-submenu current" aria-labelledby="ml-plugins">
+	<li class="ow-submenu-head">插件<span class="update-plugins count-2"><span class="plugin-count">2</span></span></li>
+	<li class="ow-first-item current"><a href="plugins.php" class="wp-first-item current">已安装的插件</a></li>
+	<li><a href="plugin-install.php">安装插件</a></li><li><a href="plugin-editor.php">编辑</a></li>
+	</ul>
+	</li>
+
+	<!--<li id="collapse-menu" class="hide-if-no-js"><div id="collapse-button"><span class="glyphicon glyphicon-resize-small"></span></div><span>收起菜单</span></li>-->
+</ul>
+		</div>
+	</div>
+
+	<script src="/res/js/jquery-1.12.3.js"></script>
+	<script src="/res/js/bootstrap.js"></script>
+	<script type="text/javascript">
+	$().ready(function(){});
+	</script>
+</body>
+</html>
