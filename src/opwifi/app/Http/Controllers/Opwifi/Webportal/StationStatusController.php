@@ -7,7 +7,7 @@ use Illuminate\Pagination\Paginator;
 
 use DB;
 
-use App\Models\OwWebportalDevices;
+use App\Models\OwWebportalStationStatus;
 
 class StationStatusController extends OwCRUDController {
 
@@ -20,7 +20,7 @@ class StationStatusController extends OwCRUDController {
     }
 
     protected function newOwnModel() {
-    	return OwWebportalStationStatus::with('device');
+    	return new OwWebportalStationStatus();
     }
 
 	public function getIndex() {

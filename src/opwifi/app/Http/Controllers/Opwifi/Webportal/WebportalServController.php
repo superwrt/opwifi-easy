@@ -330,15 +330,18 @@ class WebportalServController extends Controller {
 	}
 
 	private function getDevice($mac) {
+		$this->devMac = $mac;
 		$dev = OwDevices::with('webportal')->where('mac', $mac)->first();
-		if ($dev->count() == 0) {
+		if (!$dev) {
 			$dev = OwDevices::create(['mac'=>$mac]);
 		}
+		$online = ['online'=>true, 'lastshow'=>date("Y-m-d H:i:s",time())];
 		$wpdev = $dev->webportal()->first();
-		if ($wpdev->count() == 0) {
-			$wpdev = $wpdev->create([]);
+		if (!$wpdev) {
+			$wpdev = $dev->webportal()->create($online);
+		} else {
+			$wpdev->update($online);
 		}
-		$wpdev->update(['online'=>true, 'lastshow'=>date("Y-m-d H:i:s",time())]);
 		$this->wpDev = $wpdev;
 	}
 
@@ -352,7 +355,7 @@ class WebportalServController extends Controller {
 
 		if (!isset($req['mac']))
 			return;
-		$this->devMac = $req['mac'];
+		$this->getDevice($req['mac']);
 
 		$rep = array("cmd" => array(
 				"users" => array(),
