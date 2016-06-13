@@ -138,7 +138,7 @@
                         {name: '确认点击', value: 'confirm'},
                         {name: '外部', value: 'partner'}
                     ]},
-                    {title:'外部Token', field:'partner_token', 'comment':'仅外部模式时使用。'},
+                    {title:'外部Token', field:'access_token', 'comment':'仅外部模式时使用。'},
                 ],row);
         }
     };
