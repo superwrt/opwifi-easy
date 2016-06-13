@@ -1,6 +1,6 @@
 ## OpWiFi Device Management Platform (Easy version)
 
-OpWiFi Easy version is base on laravel framework, write by php.
+OpWiFi Easy version is based on laravel framework, write by php.
 
 ## Official Documentation
 
