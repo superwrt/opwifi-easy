@@ -5,13 +5,13 @@ OpWiFi是由Terra针对[SuperWRT](http://superwrt.com)系统开发的设备管�
 
 使用PHP编写，采用了Laravel框架。
 
-OpWiFi是SuperWRT项目的一部分，官方网站是：
+OpWiFi是SuperWRT项目的一部分，官方网站是：[http://superwrt.com](http://superwrt.com)
 
-由于Terra对于PHP开发，也是遍写遍学，有问题的地方，欢迎指正。
+由于Terra对于PHP开发，也是边写边学，有问题的地方，欢迎指正。
 
 ##OpWiFi功能
 
-OpWiFi Easy版本使用HTTP协议与设备交互。
+OpWiFi Easy版本使用HTTP协议与设备交互，有数字签名验证，可选对内容进行加密。支持以功能：
 
 * 管理设备：
     * 查看设备状态
@@ -40,7 +40,7 @@ OpWiFi Easy版本使用HTTP协议与设备交互。
 
 ##捐助开发者
 
-虽然OpWiFi是`免费`的，您可以免费使用，但也希望您可以捐助我们，以支持我们将该项目发展的更好。
+虽然OpWiFi是`免费`的，您可以无偿使用，但也希望您可以捐助我们，以支持我们将该项目发展的更好。
 
 ##感激
 
@@ -56,7 +56,7 @@ OpWiFi Easy版本使用HTTP协议与设备交互。
 
 ##使用许可
 
-OpWiFi Easy版本为完全开源，不显示任何商业使用行为，使用Apache v2许可。
+OpWiFi Easy版本为完全开源，不限止任何商业使用行为，使用Apache v2许可。
 
 特别条款：您可以对OpWiFi项目进行任何更改，但以下内容必须保留：
 
