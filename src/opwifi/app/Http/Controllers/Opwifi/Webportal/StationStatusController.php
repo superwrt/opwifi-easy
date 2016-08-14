@@ -14,8 +14,7 @@ class StationStatusController extends OwCRUDController {
 	protected $viewData = array(
 	);
 
-    public function __construct()
-    {
+    public function __construct() {
 
     }
 

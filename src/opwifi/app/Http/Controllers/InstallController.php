@@ -35,6 +35,9 @@ class InstallController extends Controller
 
     /**
      * @param EnvironmentManager $environmentManager
+     * @param RequirementsChecker $rChecker
+     * @param PermissionsChecker $pChecker
+     * @param DatabaseManager $databaseManager
      */
     public function __construct(EnvironmentManager $environmentManager,
     	RequirementsChecker $rChecker,
@@ -88,8 +91,7 @@ class InstallController extends Controller
     /**
      * Processes the newly saved environment configuration and redirects back.
      *
-     * @param Request $input
-     * @param Redirector $redirect
+     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function postConfigsSave(Request $request)
@@ -164,7 +166,6 @@ class InstallController extends Controller
     /**
      * Update installed file and display finished view.
      *
-     * @param InstalledFileManager $fileManager
      * @return \Illuminate\View\View
      */
     public function getFinal()

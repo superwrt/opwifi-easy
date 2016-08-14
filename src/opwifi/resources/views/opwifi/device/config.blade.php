@@ -34,7 +34,6 @@
 </div>
 @endsection
 
-
 @section('header_css')
     <link rel="stylesheet" href="/res/pkgs/jstree/themes/default/style.min.css">
 	<link rel="stylesheet" href="/res/pkgs/bootstrap-table/bootstrap-table.css">
@@ -100,6 +99,9 @@
 
     function operateFormatter(value, row, index) {
         return [
+            // '<a class="detail" href="javascript:void(0)" title="Detail">',
+            // '<i class="glyphicon glyphicon-eye-open"></i>',
+            // '</a>  ',
             '<a class="edit" href="javascript:void(0)" title="Edit">',
             '<i class="glyphicon glyphicon-pencil"></i>',
             '</a>  '
@@ -107,12 +109,15 @@
     }
 
     window.operateEvents = {
-        'click .edit': function (e, value, row, index) {
+        'click .detail': function (e, value, row, index) {
             $.opwifi.ajaxOpwifiEdit("{{ '/'.Request::path().'/update' }}", $table,
                 'edit', '修改配置',
                 [ {type:'hidden', field:'id'}, {title:'配置', field:'config', type:"textarea"} ],
                 row);
-        }
+        },
+        'click .edit': function (e, value, row, index) {
+            window.location = "{{URL::route('opwifi::device.config')}}/edit/"+row.id;
+        },
     };
 
     $().ready(function(){

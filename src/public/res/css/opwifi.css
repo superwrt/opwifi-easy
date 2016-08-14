@@ -34,6 +34,13 @@ a, div {
     outline: 0;
 }
 
+/* change bootstrap */
+.form-inline .form-group{
+    margin-left: 0;
+    margin-right: 0;
+}
+
+/* */
 #owwrap {
     height: auto;
     min-height: 100%;

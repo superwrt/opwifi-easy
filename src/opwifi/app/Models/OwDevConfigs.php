@@ -8,7 +8,7 @@ class OwDevConfigs extends Model
 {
     protected $table = 'ow_dev_configs';
 
-    protected $fillable = ['name', 'comment', 'config'];
+    protected $fillable = ['name', 'comment', 'pdata', 'config'];
 
     public function devices()
     {

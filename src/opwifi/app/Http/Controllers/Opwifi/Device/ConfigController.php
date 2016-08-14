@@ -9,6 +9,8 @@ use Input;
 
 use App\Models\OwDevConfigs;
 
+//use App\Http\Helpers\Opwifi\DeviceConfigApply;
+
 class ConfigController extends OwCRUDController {
 
 	protected $viewData = array(
@@ -27,4 +29,23 @@ class ConfigController extends OwCRUDController {
 		return view("opwifi.device.config", $this->viewData);
 	}
 
+    public function getEdit(Request $request, $id) {
+        $cfg = OwDevConfigs::where("id", $id)->first();
+        return view("opwifi.device.config_edit", $this->viewData)->with('config', $cfg);
+    }
+
+    public function postEdit(Request $request, $id) {
+        $cfg = OwDevConfigs::where("id", $id)->first();
+        $cfg->update($request->all());
+        return redirect()->route('opwifi::device.config');
+    }
+
+    // public function getTest(Request $request, $id) {
+    //     $cfg = OwDevConfigs::where("id", $id)->first();
+    //     $pdata = json_decode($cfg->pdata, true);
+    //     $config = $pdata['config'];
+    //     $apply = new DeviceConfigApply();
+    //     $setting = $apply->getSetting('/', $config);
+    //     return response()->json($setting);
+    // }
 }

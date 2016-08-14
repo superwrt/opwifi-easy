@@ -147,10 +147,6 @@
         }
     };
 
-    function getHeight() {
-        return $(window).height() - $('h1').outerHeight(true);
-    }
-
     function detailFormatter(index, row) {
         var html = [];
         function dump(key, value) {
@@ -174,10 +170,10 @@
         $('#dev_reboot').ajaxOpwifiOperation("{{ '/'.Request::path().'/reboot' }}", $table);
         $('#dev_upgrade').ajaxOpwifiBind("{{ '/'.Request::path().'/update' }}", $table,
             'op_upgrade', '同步版本', '/m/device/firmware/select', 'name',
-            'meta.op_upgrade_id');
+            'op_upgrade_id');
         $('#dev_config').ajaxOpwifiBind("{{ '/'.Request::path().'/update' }}", $table,
             'op_config', '同步配置', '/m/device/config/select', 'name',
-            'meta.op_config_id');
+            'op_config_id');
     });
 
     </script>

@@ -13,12 +13,13 @@ use App\Models\OwDevFirmwares;
 use App\Models\OwSystem;
 
 use App\Http\Middleware\HttpSignatures;
+use App\Http\Helpers\Opwifi\DeviceConfigApply;
 
 class DeviceServController extends Controller {
 
-	private $metaId = 0;
+	private $meta;
 
-	private $isFit, $devParam;
+	private $isFit, $devParam, $configSha1;
 
 	private $enCrypted = array();
 
@@ -45,6 +46,7 @@ class DeviceServController extends Controller {
 			return false;
 		$iv = str_random(16);
 		$j = json_encode($data);
+		Log::debug("Encrypto:".var_export($j, true));
 		$encrypted = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $aesKey, $j, MCRYPT_MODE_CBC, $iv);
 		$ctx = base64_encode($encrypted);
 		if (!isset($rep['crypto'])) {
@@ -93,10 +95,6 @@ class DeviceServController extends Controller {
 
 		Log::info("Update Device Info:".var_export($req, true));
 
-		if (isset($req['mode']) && $req['mode']=='fit')
-			$this->isFit = true;
-		$this->devParam = isset($req['param'])?$req['param']:[];
-
 		$meta = self::arrayConvert($req, [
 			['firmware.version', 'fwver'],
 			['firmware.full_version', 'fullver'],
@@ -122,29 +120,56 @@ class DeviceServController extends Controller {
 			} else {
 				$resm = $res->meta()->updateOrCreate($meta);
 			}
-			$this->metaId = $resm['id'];
+			$this->meta = $resm;
 		} else {
 			$dev = ['mac' => $req['mac']];
 			$res = OwDevices::create($dev);
 			$resm = $res->meta()->updateOrCreate($meta);
-			$this->metaId = $resm['id'];
+			$this->meta = $resm;
 		}
-		return $this->metaId;
+		return;
+	}
+
+	private function updateOperation($req) {
+		if (isset($req['mode']) && $req['mode']=='fit')
+			$this->isFit = true;
+		$this->devParam = isset($req['param'])?$req['param']:[];
+
+		if (isset($req['config']) && is_array($req['config'])) {
+			$cfg = $req['config'];
+			$this->configSha1 = $cfg['sha1'];
+			//Check return set_sha1!!
+			if (isset($cfg['set_ret']) && $cfg['set_ret']) {
+				DeviceConfigApply::devmeta($this->meta)->update($this->configSha1);
+			}
+		}
 	}
 
 	private function appendOperation($req, &$rep) {
-		if (!$this->metaId) return;
-		$res = OwDevicemeta::where('id', $this->metaId)->first();
-		if (!$res) return;
-
 		$reboot = false;
+
+		$this->updateOperation($req);
 
 		/* For test */
 		/* end */
 
+		if ($this->meta->op_config_id &&
+				$this->configSha1) {
+			/* 简单处理，如果更改过，就进行下发 */
+			$setting = DeviceConfigApply::devmeta($this->meta)->check($this->configSha1);
+			if ($setting) {
+				$this->enCrypted['config'] = array(
+					'set' => $setting,
+					'set_sha1' => $this->configSha1,
+				);
+				/* We must use apply time, not return time!!! */
+				$this->meta->update(['op_configed_last' => date("Y-m-d H:i:s",time())]);
+			}
+		}
+/*
 		if ($this->isFit &&
-				$res['op_config_id']) {//Only support Fit now!
-			$cfg = $res->config()->first();
+				$this->meta['op_config_id']) {//Only support Fit now!
+			$cfg = $this->meta->config()->first();
 			if ($cfg) {
 				if (isset($this->devParam['fit_config_md5'])) {
 					if ($this->devParam['fit_config_md5'] != $cfg['md5']) {
@@ -161,18 +186,18 @@ class DeviceServController extends Controller {
 				}
 			}
 		}
-
-		if ($res['op_reboot'] || $reboot) {
+*/
+		if ($this->meta['op_reboot'] || $reboot) {
 			if (!isset($rep['config'])) $rep['config'] = array();
 			if (!isset($rep['config']['task'])) $rep['config']['task'] = array();
 			$rep['config']['task'][] = array('name'=>'sys.reboot');
-			$res->update(['op_reboot'=>false]);
+			$this->meta->update(['op_reboot'=>false]);
 			return;
 		}
 
-		if ($res['op_upgrade_id']){
-			$fw = $res->upgrade()->first();
-			if ($fw && $res['m_fullver'] != $fw['version']) {
+		if ($this->meta['op_upgrade_id']){
+			$fw = $this->meta->upgrade()->first();
+			if ($fw && $this->meta['m_fullver'] != $fw['version']) {
 				$rep['upgrade'] = array(
 					"firmware"=> [
 						"upgrade"=> [
@@ -182,7 +207,7 @@ class DeviceServController extends Controller {
 					]
 				);
 			} else {
-				$res->update(['op_upgrade_id'=>null]);
+				$this->meta->update(['op_upgrade_id'=>null]);
 			}
 		}
 	}
@@ -224,45 +249,47 @@ class DeviceServController extends Controller {
 		return response()->json($rep);
 	}
 
-	// 	命令示例：
-	// 		$this->encryptoCtx($req, $rep,array(
-	// 			'config'=>array(
-	// 				'set'=> array(
-	// 					'wlan'=> array(
-	// 						'vap'=>array(
-	// 					 		array('name'=>'wlan0', 'ssid'=>'Hi'),
-	//							array('_o'=>'add','name'=>'wlan10', 'radio'=>'phy0','ssid'=>'Hi', 'enable'=>true, 'vlan'=>10, 'mode'=>'ap',"auth"=>"open"),
-	//							array('_o'=>'del','name'=>'wlan10')
-	// 					 	 )
-	// 					 )
-	//				),
-	// 				'get'=>true,
-	// 				'task'=>array(
-	// 				 	array('name'=>'sys.reboot'),
-	// 				)
-	// 			),
-	//			'notice' => array(
-	// 				'upgrade' => array(
-	// 					"type"=> "firmware",
-	// 					"version"=> "tiny\/0.1.1",
-	// 					"description"=> "改进了xxx",
-	// 					"web"=> "http://baidu.com",
-	// 					"url"=> "http://192.168.17.10/superwrt-qca-ar934x-tiny.spkg",
-	// 					"sha1"=> "8aa1a20ecdc53e3fbd7c00088eba6fadc790aa14",
-	// 				),
-	//			),
-	// 			'upgrade' => array(
-	// 		         "firmware"=> array(//Write to config file
-	// 		             "recovery"=>array(
-	// 		                 "url"=>"http://superwrt.com/superwrt-qca-ar934x-tiny.spkg",
-	// 		                 "sha1"=>"8aa1a20ecdc53e3fbd7c00088eba6fadc790aa14"
-	// 		             ),
-	// 		              "upgrade"=>array(
-	// 		                  "url"=>"http://superwrt.com/superwrt-qca-ar934x-tiny.spkg",
-	// 		                  "sha1"=>"8aa1a20ecdc53e3fbd7c00088eba6fadc790aa14"
-	// 		              ),
-	// 		         )
-	// 			)
-	// 		));
+/*
+	命令示例：
+		$this->encryptoCtx($req, $rep,array(
+			'config'=>array(
+				'set'=> array(
+					'wlan'=> array(
+						'vap'=>array(
+					 		array('name'=>'wlan0', 'ssid'=>'Hi'),
+							array('_o'=>'add','name'=>'wlan10', 'radio'=>'phy0','ssid'=>'Hi', 'enable'=>true, 'vlan'=>10, 'mode'=>'ap',"auth"=>"open"),
+							array('_o'=>'del','name'=>'wlan10')
+					 	 )
+					 )
+				),
+				'get'=>true,
+				'task'=>array(
+				 	array('name'=>'sys.reboot'),
+				)
+			),
+			'notice' => array(
+				'upgrade' => array(
+					"type"=> "firmware",
+					"version"=> "tiny\/0.1.1",
+					"description"=> "改进了xxx",
+					"web"=> "http://baidu.com",
+					"url"=> "http://192.168.17.10/superwrt-qca-ar934x-tiny.spkg",
+					"sha1"=> "8aa1a20ecdc53e3fbd7c00088eba6fadc790aa14",
+				),
+			),
+			'upgrade' => array(
+		         "firmware"=> array(//Write to config file
+		             "recovery"=>array(
+		                 "url"=>"http://superwrt.com/superwrt-qca-ar934x-tiny.spkg",
+		                 "sha1"=>"8aa1a20ecdc53e3fbd7c00088eba6fadc790aa14"
+		             ),
+		              "upgrade"=>array(
+		                  "url"=>"http://superwrt.com/superwrt-qca-ar934x-tiny.spkg",
+		                  "sha1"=>"8aa1a20ecdc53e3fbd7c00088eba6fadc790aa14"
+		              ),
+		         )
+			)
+		));
+*/
 
 }

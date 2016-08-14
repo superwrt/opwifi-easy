@@ -20,17 +20,23 @@ class CreateOwWebportalUsersTable extends Migration
             $table->string('comment', 256);
             $table->boolean('disable');
             $table->boolean('roaming');
+            $table->unsignedInteger('multi');
             $table->string('phone',32);
-            $table->timestamp('lastonline');
-            $table->string('lastdevmac', 20);
-            $table->string('laststamac', 20);
+
             $table->unsignedInteger('login_count');
+            $table->timestamp('last_online');
+            $table->string('last_devmac', 20);
+            $table->string('last_stamac', 20);
+
             $table->unsignedInteger('tx_rate');
             $table->unsignedInteger('rx_rate');
-            $table->unsignedBigInteger('trx_used');
             $table->unsignedBigInteger('trx_limit');
             $table->unsignedInteger('time_limit');
+            $table->timestamp('limit_start');
+
+            $table->unsignedBigInteger('trx_used');
             $table->unsignedInteger('time_used');
+
             $table->timestamps();
         });
     }

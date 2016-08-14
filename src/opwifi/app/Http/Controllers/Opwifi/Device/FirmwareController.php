@@ -75,7 +75,7 @@ class FirmwareController extends Controller {
         $ver = "";
         $hf = fopen ($file->getPathName(), "rb");
         $magic = fread($hf, 4);
-        if (unpack("N",$magic)[1] == 0x5370eb67) {
+        if (unpack("N", $magic)[1] == 0x5370eb67) {
         	fseek($hf, 0x88, SEEK_SET);
         	$info = fread($hf, 56);
         	$ver = unpack("Z*",$info)[1];

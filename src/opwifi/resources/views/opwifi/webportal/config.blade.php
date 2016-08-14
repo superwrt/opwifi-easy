@@ -123,22 +123,22 @@
     window.operateEvents = {
         'click .edit': function (e, value, row, index) {
             $.opwifi.ajaxOpwifiEdit("{{ '/'.Request::path().'/update' }}", $table,
-                'editcfg', '修改配置',[
+                'editcfg'+row.id, '修改配置',[
                     {field:'id', type:'hidden'},
                     {title:'名称', field:'name'},
-                    {title:'重定向地址', field:'redirect', 'comment':'以http://开头。'},
-                    {title:'强制超时时间', field:'force_timeout', 'comment':'秒，60-2592000。'},
-                    {title:'空闲超时时间', field:'idle_timeout', 'comment':'秒，20-172800。'},
-                    {title:'最大用户数', field:'max_users', 'comment':'为0时不限制。'},
-                    {title:'上报周期', field:'period', 'comment':'秒，5-172800。'},
-                    {title:'IP白名单', field:'white_ip', type:"textarea", 'comment':'多个之间以“,”号分隔。'},
-                    {title:'域名白名单', field:'white_domain', type:"textarea", 'comment':'多个之间以“,”号分隔。'},
+                    {title:'重定向地址', field:'redirect', comment:'以http://开头。'},
+                    {title:'强制超时时间', field:'force_timeout', comment:'秒，60-2592000。'},
+                    {title:'空闲超时时间', field:'idle_timeout', comment:'秒，20-172800。'},
+                    {title:'最大用户数', field:'max_users', comment:'为0时不限制。'},
+                    {title:'上报周期', field:'period', comment:'秒，5-172800。'},
+                    {title:'IP白名单', field:'white_ip', type:"textarea", comment:'多个之间以“,”号分隔。'},
+                    {title:'域名白名单', field:'white_domain', type:"textarea", comment:'多个之间以“,”号分隔。'},
                     {title:'模式', field:'mode', type:"select", opts: [
                         {name: '用户登录', value: 'login'},
                         {name: '确认点击', value: 'confirm'},
                         {name: '外部', value: 'partner'}
                     ]},
-                    {title:'外部Token', field:'access_token', 'comment':'仅外部模式时使用。'},
+                    {title:'外部Token', field:'access_token', comment:'仅外部模式时使用。'},
                 ],row);
         }
     };

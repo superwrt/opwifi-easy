@@ -16,18 +16,18 @@ class DeviceStatusController extends OwCRUDController {
 	protected $viewData = array(
 	);
 
-    public function __construct()
-    {
+    public function __construct() {
 
     }
 
-    protected function newOwnModel() {
-    	return OwWebportalDevices::with('device');
-    }
     protected $indexOwnModelTag = 'dev_id';
     protected function newOwnModelTagRelationships() {
         return new OwDevtagRelationships();
     }
+    protected function newOwnModel() {
+    	return OwWebportalDevices::with('device');
+    }
+
 
 	public function getIndex() {
 		return view("opwifi.webportal.device_status", $this->viewData);

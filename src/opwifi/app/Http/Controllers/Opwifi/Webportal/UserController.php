@@ -25,7 +25,7 @@ class UserController extends OwCRUDController {
     }
 
     static function passwordShadow($username, $password) {
-        return md5($password);
+        return md5($username."opwifi".$password);
     }
 
 	public function getIndex() {

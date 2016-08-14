@@ -14,4 +14,8 @@ class OwWebportalStationStatus extends Model
     {
         return $this->belongsTo('App\Models\OwWebportalUsers', 'user_id');
     }
+   	public function authdev()
+    {
+        return $this->belongsTo('App\Models\OwWebportalDevices', 'authdev_id');
+    }
 }

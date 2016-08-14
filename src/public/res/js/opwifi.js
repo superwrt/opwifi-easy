@@ -10,25 +10,54 @@
 !function($) {
     'use strict';
 
-    var firstLoad = false;
+    var getItemField = function (item, field, escape) {
+        var value = item;
+
+        if (typeof field !== 'string' || item.hasOwnProperty(field)) {
+            return escape ? escapeHTML(item[field]) : item[field];
+        }
+        var props = field.split('.');
+        for (var p in props) {
+            value = (value && value[props[p]] !== undefined)?value[props[p]]:null;
+        }
+        return escape ? escapeHTML(value) : value;
+    };
+
+    var setItemField = function (item, field, value) {
+        if (typeof field !== 'string' || item.hasOwnProperty(field)) {
+            return item[field] = value;
+        }
+        var props = field.split('.');
+        for (var p in props) {
+            if (p == props.length - 1) {
+                item[props[p]] = value;
+            } else {
+                if (item[props[p]] === undefined || typeof(item[props[p]]) != "object") {
+                    item[props[p]] = isNaN(Number(props[p]))?new Object():new Array();
+                }
+                item = item[props[p]];
+            }
+        }
+    };
 
     var createModal = function(id, type, title) {
-        var vModal = '<div id="ow'+type+'Modal_'+id+'"  class="modal fade" tabindex="-1" role="dialog" aria-labelledby="owSmallModalLabel" aria-hidden="true">';
-        vModal += '<div class="modal-dialog modal-xs">';
-        vModal += ' <div class="modal-content">';
-        vModal += '  <div class="modal-header">';
-        vModal += '   <button type="button" class="close" data-dismiss="modal" aria-hidden="true" >&times;</button>';
-        vModal += '   <h4 class="modal-title">'+title+'</h4>';
-        vModal += '  </div>';
-        vModal += '  <div class="modal-body modal-body-custom">';
-        vModal += '   <div class="container-fluid" id="ow'+type+'ModalContent_'+id+'" style="padding-right: 0px;padding-left: 0px;" >';
-        vModal += '   </div>';
-        vModal += '  </div>';
-        vModal += '  </div>';
-        vModal += ' </div>';
-        vModal += '</div>';
+        var vModal = new Array();
+        vModal.push('<div id="ow'+type+'Modal_'+id+'"  class="modal fade" tabindex="-1" role="dialog" aria-labelledby="owSmallModalLabel" aria-hidden="true">');
+        vModal.push('<div class="modal-dialog modal-xs">');
+        vModal.push(' <div class="modal-content">');
+        vModal.push('  <div class="modal-header">');
+        vModal.push('   <button type="button" class="close" data-dismiss="modal" aria-hidden="true" >&times;</button>');
+        vModal.push('   <h4 class="modal-title">'+title+'</h4>');
+        vModal.push('  </div>');
+        vModal.push('  <div class="modal-body modal-body-custom">');
+        vModal.push('   <div class="container-fluid" id="ow'+type+'ModalContent_'+id+'" style="padding-right: 0px;padding-left: 0px;" >');
+        vModal.push('   </div>');
+        vModal.push('  </div>');
+        vModal.push('  </div>');
+        vModal.push(' </div>');
+        vModal.push('</div>');
 
-        $("body").append($(vModal));
+        $("body").append($(vModal.join('')));
     }
 
     var pushModalOperation = function(id, type, htmlForm) {
@@ -56,11 +85,9 @@
 	            $("#"+id).submit(function(e) {
 	            	var $this = $(this);
 	            	var fields = [];
-                    $this.find('checkbox').each(function() {
-                        fields.push({'name':this.name, 'id':this.id, 'value':$(this).prop("checked")});
-                    });
 	            	$this.find('input').each(function() {
-	            		fields.push({'name':this.name, 'id':this.id, 'value':this.value});
+	            		fields.push({'name':this.name, 'id':this.id, 'value':
+                            ($(this).prop("type") == "checkbox")?$(this).prop("checked"):this.value});
 	            	});
                     $this.find('textarea').each(function() {
                         fields.push({'name':this.name, 'id':this.id, 'value':this.value});
@@ -68,9 +95,13 @@
 	            	$this.find('select').each(function() {
 	            		fields.push({'name':this.name, 'id':this.id, 'value':this.value});
 	            	});
-	            	if (apply($this, fields)) {
-		                $("#owInputModal" + "_" + id).modal('hide');
-		            }
+                    try {
+    	            	if (apply($this, fields)) {
+    		                $("#owInputModal" + "_" + id).modal('hide');
+    		            }
+                    } catch(e) {
+                        console.log(e);
+                    }
 	                return false;
 	            });
 	        }
@@ -84,7 +115,7 @@
         	id+'" '+(typeof(apply)=='string'?'action="'+apply+'"':'')+'>');
         for (var i in opts) {
             var opt = opts[i];
-            var val = vals[opt.field];
+            var val = getItemField(vals, opt.field);
             if (opt.type != 'hidden') {
                 htmlForm.push('<div class="form-group">');
                 htmlForm.push('<label class="col-sm-4 control-label">'+opt.title+'</label>');
@@ -92,8 +123,9 @@
             }
             switch(opt.type) {
             case 'check':
-            	htmlForm.push('<input type="checkbox" class="form-control input-md" name="'+
-            		opt.field+'" placeholder="'+opt.title+'" id="'+id+'_'+opt.field+'" checked='+(val?true:false)+'>');
+                console.log(val);
+            	htmlForm.push('<label><input type="checkbox" class="input-md" name="'+
+            		opt.field+'" placeholder="'+opt.title+'" id="'+id+'_'+opt.field+'" '+(val?"checked":'')+'></label>');
             	break;
             case 'select':
 				htmlForm.push('<select class="form-control input-md" name="'+
@@ -161,6 +193,7 @@
             htmlForm.push('<form class="form-horizontal" method="post" id="'+
                 id+'" '+(typeof(apply)=='string'?'action="'+apply+'"':'')+'>');
             htmlForm.push('<select class="form-control input-md" name="'+bindField+'" placeholder="'+title+'" id="'+id+'_sel" >');
+            htmlForm.push('<option value="">无</option>');
             for (var i in srcDat) {
                 var o = srcDat[i];
                 htmlForm.push('<option value="'+o.id+'" >'+o[dispField]+'</option>');
@@ -205,7 +238,9 @@
                 text+'</div>';
             $parent.append(h);
             setTimeout(function() {if ($('#'+id).length)$('#'+id).remove();},1500);
-        }
+        },
+        getItemField: getItemField,
+        setItemField: setItemField
     };
 
     $.fn.opwifi = function() {
@@ -269,17 +304,6 @@
         });
     };
 
-    $.opwifi.ajaxOpwifiEdit = function (url, $table, id, modalTitle, opts, vals) {
-        showInputModal(id, modalTitle, opts, vals, function($form, field) {
-            var items = {};
-            for(var i in field) {
-                items[field[i]['name']] = field[i]['value'];
-            }
-            ajaxOpwifiApply(url, $table, items);
-            return true;
-        });
-    };
-
     $.fn.ajaxOpwifiBind = function (url, $table, id, title, srcUrl, dispField, bindField) {
         var $this = $(this);
         $this.click(function(){
@@ -309,6 +333,28 @@
             showSelectModal(id, title, srcUrl, dispField, bindField, apply);
         });
     };
+
+    $.opwifi.ajaxOpwifiEdit = function (url, $table, id, modalTitle, opts, vals) {
+        showInputModal(id, modalTitle, opts, vals, function($form, field) {
+            var items = {};
+            for(var i in field) {
+                items[field[i]['name']] = field[i]['value'];
+            }
+            ajaxOpwifiApply(url, $table, items);
+            return true;
+        });
+    };
+
+    $.opwifi.rowOpwifiEdit = function (idx, $table, id, modalTitle, opts, vals) {
+        showInputModal(id, modalTitle, opts, vals, function($form, field) {
+            for(var i in field) {
+                setItemField(vals, field[i]['name'], field[i]['value']);
+            }
+            $table.bootstrapTable('updateRow', {index: idx, row: vals});
+            return true;
+        });
+    };
+
 
 
 }(jQuery);

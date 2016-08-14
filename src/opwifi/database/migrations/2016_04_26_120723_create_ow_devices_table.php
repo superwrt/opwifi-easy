@@ -27,6 +27,7 @@ class CreateOwDevicesTable extends Migration
             $table->increments('id');
             $table->string('name', 64);
             $table->string('comment', 256);
+            $table->text('pdata');
             $table->text('config');
             $table->string('md5',16);
 
@@ -68,11 +69,15 @@ class CreateOwDevicesTable extends Migration
             $table->string('ramsize',16);
             $table->string('ramfree',16);
 
+            $table->text('op_config');//Device spesific config.
+            $table->string('op_configed_sha1',40);//If change op_config, clear it!
+            $table->timestamp('op_configed_last');//To compare with config in ow_dev_configs.
+            $table->unsignedInteger('op_config_id')->nullable();
+            $table->foreign('op_config_id')->references('id')->on('ow_dev_configs')->onDelete('set null');
+
             $table->boolean('op_reboot');
             $table->unsignedInteger('op_upgrade_id')->nullable();
-            $table->unsignedInteger('op_config_id')->nullable();
             $table->foreign('op_upgrade_id')->references('id')->on('ow_dev_firmwares')->onDelete('set null');
-            $table->foreign('op_config_id')->references('id')->on('ow_dev_configs')->onDelete('set null');
 
             $table->timestamps();
         });

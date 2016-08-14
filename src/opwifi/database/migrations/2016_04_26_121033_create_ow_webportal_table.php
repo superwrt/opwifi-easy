@@ -16,12 +16,14 @@ class CreateOwWebportalTable extends Migration
             $table->engine = 'InnoDB';
             $table->increments('id');
             $table->string('name',128);
+            $table->text('comment');
 
+            $table->boolean('roaming');
             $table->string('mode', 32);
             $table->string('access_token', 128);
-            $table->text('comment');
-            $table->string('redirect',256);
             $table->string('success_redirect',256);
+
+            $table->string('redirect',256);
             $table->unsignedInteger('force_timeout');
             $table->unsignedInteger('idle_timeout');
             $table->text('white_ip');
@@ -34,6 +36,7 @@ class CreateOwWebportalTable extends Migration
         Schema::create('ow_webportal_tokens', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
+
             $table->string('token', 64)->unique()->index();
             $table->string('mac', 20);
             $table->string('usermac', 20);
@@ -41,48 +44,64 @@ class CreateOwWebportalTable extends Migration
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('ow_webportal_users')->onDelete('set null');
 
+            $table->string('username', 64);
+            $table->unsignedInteger('tx_rate');
+            $table->unsignedInteger('rx_rate');
+            $table->unsignedBigInteger('trx_limit');
+            $table->unsignedInteger('time_limit');
+
+            $table->timestamps();
+        });
+        Schema::create('ow_webportal_devices', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
+            $table->bigIncrements('id');
+
+            $table->unsignedBigInteger('dev_id')->unique();
+            $table->unsignedInteger('config_id')->nullable();
+            $table->foreign('dev_id')->references('id')->on('ow_devices')->onDelete('cascade');
+            $table->foreign('config_id')->references('id')->on('ow_webportal_configs')->onDelete('set null');
+
+            $table->boolean('online');
+            $table->timestamp('lastshow');
+            $table->unsignedInteger('users');
+
             $table->timestamps();
         });
         Schema::create('ow_webportal_station_status', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
+
             $table->string('mac', 20)->unique()->index();
             $table->string('ondev', 20)->index();
             $table->unsignedBigInteger('authdev_id')->nullable();
-            $table->foreign('authdev_id')->references('id')->on('ow_devices')->onDelete('set null');
+            $table->foreign('authdev_id')->references('id')->on('ow_webportal_devices')->onDelete('set null');
 
             $table->boolean('online');
-            $table->boolean('auth');
+            $table->boolean('authed');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('ow_webportal_users')->onDelete('set null');
 
             $table->string('ssid', 32);
             $table->string('bssid', 20);
             $table->string('gatewayip', 64);
-            $table->timestamp('lastdeadline');
-            $table->timestamp('lastonline');
-            $table->timestamp('lastoffline');
 
-            $table->unsignedInteger('online_time');
-            $table->unsignedInteger('online_total');
+            $table->timestamp('last_auth');
+            $table->timestamp('last_deadline')->nullable();
+            $table->timestamp('last_online');
+            $table->timestamp('last_offline');
+
+            $table->string('username', 64);
             $table->unsignedInteger('tx_rate');
             $table->unsignedInteger('rx_rate');
+            $table->unsignedBigInteger('trx_limit');
+            $table->unsignedInteger('time_limit');
+
             $table->unsignedBigInteger('trx_used');
             $table->unsignedBigInteger('trx_total');
-            $table->unsignedBigInteger('lasttrx_total');
-
-            $table->timestamps();
-        });
-        Schema::create('ow_webportal_devices', function (Blueprint $table) {
-            $table->engine = 'InnoDB';
-            $table->increments('id');
-            $table->unsignedBigInteger('dev_id')->unique();
-            $table->unsignedInteger('config_id')->nullable();
-            $table->foreign('dev_id')->references('id')->on('ow_devices')->onDelete('cascade');
-            $table->foreign('config_id')->references('id')->on('ow_webportal_configs')->onDelete('set null');
-            $table->boolean('online');
-            $table->timestamp('lastshow');
-            $table->unsignedInteger('users');
+            $table->unsignedBigInteger('trx_history');
+            $table->unsignedInteger('time_used');
+            $table->unsignedInteger('time_total');
+            $table->unsignedInteger('time_history');
 
             $table->timestamps();
         });

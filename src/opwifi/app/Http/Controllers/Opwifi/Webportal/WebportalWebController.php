@@ -55,11 +55,11 @@ class WebportalWebController extends Controller {
 			if ($request->has($ckUser)) {
 				$in = $request->only($ckUser);
 				$user = OwWebportalUsers::where('username', $input['username'])->first();
-				if ($user->count()) {
+				if ($user) {
 					$pwd = UserController::passwordShadow($input['username'], $input['password']);
 				}
 			}
-			if (!$user || $user->count() == 0 || $pwd != $user['shadow']) {
+			if (!$user || $pwd != $user['shadow']) {
 				$this->viewData['error']='用户不存在，或密码错误。';
 				return view("opwifi.webportal.web.login", array_merge($this->viewData,
 					['title' => $cfg['name'], 'mode' => $cfg['mode'], 'error' => '用户不存在，或密码错误。', 'from' => $input]));
@@ -70,9 +70,13 @@ class WebportalWebController extends Controller {
 			return view("opwifi.webportal.web.failed", array_merge($this->viewData,
 				['error'=>'内部错误。']));
 		}
-		$token = WebportalServController::auth($input['mac'], $input['usermac'], $user, $cfg['success_redirect']);
-		/* 使用oplogin.com而不是gateway! */
+		$token = WebportalServController::authUser($input['mac'], $input['usermac'], $cfg['success_redirect'], $user);
+		if (!$token) {
+			return view("opwifi.webportal.web.login", array_merge($this->viewData,
+					['title' => $cfg['name'], 'mode' => $cfg['mode'], 'error' => '该账号不允许登录。可能是流量或时长超出限制。', 'from' => $input]));
+		}
 
+		/* 使用oplogin.com而不是gateway! */
 		$path = 'http://oplogin.com/api/webp/1/confirm?'.
 				http_build_query(array_merge($input, ['token'=>$token]));
 
