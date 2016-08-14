@@ -71,7 +71,8 @@ class ProcessUtils
             return $escapedArgument;
         }
 
-        return escapeshellarg($argument);
+        return !$argument || preg_match('{^[\w-:]+$}', $argument) ? $argument : escapeshellarg($argument);
+        //return escapeshellarg($argument);
     }
 
     /**
