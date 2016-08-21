@@ -72,7 +72,13 @@
                     }, {
                         field: 'redirect',
                         title: '重定向地址',
-                        sortable: true,
+                        formatter: function (value, row, index) {
+                            if(row['mode']=='partner') {
+                                return value;
+                            } else {
+                                return row['mode']=='login'?'(用户登录)':'(确认点击)';
+                            }
+                        }
                     }, {
                         field: 'force_timeout',
                         title: '强制超时时间',
@@ -126,7 +132,6 @@
                 'editcfg'+row.id, '修改配置',[
                     {field:'id', type:'hidden'},
                     {title:'名称', field:'name'},
-                    {title:'重定向地址', field:'redirect', comment:'以http://开头。'},
                     {title:'强制超时时间', field:'force_timeout', comment:'秒，60-2592000。'},
                     {title:'空闲超时时间', field:'idle_timeout', comment:'秒，20-172800。'},
                     {title:'最大用户数', field:'max_users', comment:'为0时不限制。'},
@@ -138,8 +143,16 @@
                         {name: '确认点击', value: 'confirm'},
                         {name: '外部', value: 'partner'}
                     ]},
+                    {title:'重定向地址', field:'redirect', comment:'以http://开头。'},
                     {title:'外部Token', field:'access_token', comment:'仅外部模式时使用。'},
                 ],row);
+            function onModeChg() {
+                var dis=($('#editcfg'+row.id+'_mode').val() == 'partner')?"block":"none";
+                $('#group_editcfg'+row.id+'_redirect').css("display", dis);
+                $('#group_editcfg'+row.id+'_access_token').css("display", dis);
+            }
+            onModeChg();
+            $('#editcfg'+row.id+'_mode').change(onModeChg);
         }
     };
 

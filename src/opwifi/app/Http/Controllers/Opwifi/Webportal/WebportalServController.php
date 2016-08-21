@@ -12,6 +12,7 @@ use App\Models\OwDevices;
 use App\Models\OwWebportalConfigs;
 use App\Models\OwWebportalStationStatus;
 use App\Models\OwWebportalTokens;
+use App\Models\OwSystem;
 
 class WebportalServController extends Controller {
 
@@ -123,16 +124,28 @@ class WebportalServController extends Controller {
         $rep = &$this->ctrlRep;
     	$cfg = self::getDevConfig($this->devMac);
     	if ($cfg) {
-    		$jcfg = array(
-    			"white_ip" => explode(',',$cfg['white_ip']),
-    			"white_domain" => explode(',',$cfg['white_domain']),
-    			"redirect" => $cfg['redirect'],
-    			"idle_timeout" => $cfg['idle_timeout'],
-    			"force_timeout" => $cfg['force_timeout'],
-    			"period" => $cfg['period'],
-    			);
-    		if (!$old ||
-    			self::arrayRecursiveDiff($jcfg, $old)) {
+            $jcfg = array(
+                "white_ip" => explode(',',$cfg->white_ip),
+                "white_domain" => explode(',',$cfg->white_domain),
+                "idle_timeout" => $cfg->idle_timeout,
+                "force_timeout" => $cfg->force_timeout,
+                "period" => $cfg->period,
+                );
+            if ($cfg->mode == 'partner') {
+                $jcfg['redirect'] = $cfg->redirect;
+            } else {
+                /* site_url maybe changed after redirect setted.*/
+                $jcfg['redirect'] = OwSystem::getValue('site_url').'/webportal';
+            }
+            if (preg_match('@^(?:http|https)://([^/:]+)@i', $jcfg['redirect'], $addr)) {
+                if (filter_var($addr[1], FILTER_VALIDATE_IP)) {
+                    $jcfg['white_ip'] = $addr[1].(strlen($jcfg['white_ip'])>0?','.$jcfg['white_ip']:'');
+                } else {
+                    $jcfg['white_domain'] = $addr[1].(strlen($jcfg['white_domain'])>0?','.$jcfg['white_domain']:'');
+                }
+            }
+
+    		if (!$old || self::arrayRecursiveDiff($jcfg, $old)) {
 					$rep['cmd']['cfg'] = $jcfg;
 			}
 		}
@@ -524,7 +537,7 @@ class WebportalServController extends Controller {
     		return response()->json(['success'=>false]);
     	}
     	$token = self::auth($req['mac'], $req['usermac'], null, $req['redir']);
-    	return response()->json(['success'=>true, 'token'=>$token]);
+    	return response()->json(['success'=>true, 'token'=>$token, 'mac'=>$req['mac'], 'usermac'=>$req['usermac']]);
     }
 
 

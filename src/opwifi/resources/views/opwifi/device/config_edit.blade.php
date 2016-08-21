@@ -151,11 +151,11 @@ include(base_path('resources/views/opwifi/common.php'));
             </div>
             <div class="form-group">
               <label for="cf_webp_serv">服务器地址</label>
-              <input type="text" class="form-control" id="cf_webp_serv" data-cfg="net.v.webportal.v.server.v" placeholder="http://xxxxx">
+              <input type="text" class="form-control" id="cf_webp_serv" data-cfg="net.v.webportal.v.remote.v.server.v" placeholder="http://xxxxx">
             </div>
             <div class="form-group">
               <label for="cf_webp_pwd">验证密码</label>
-              <input type="email" class="form-control" id="cf_webp_pwd" data-cfg="net.v.webportal.v.password.v" placeholder="可选">
+              <input type="email" class="form-control" id="cf_webp_pwd" data-cfg="net.v.webportal.v.remote.v.password.v" placeholder="可选">
             </div>
           </div>
           <div class="clearfix"></div>

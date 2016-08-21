@@ -117,7 +117,7 @@
             var opt = opts[i];
             var val = getItemField(vals, opt.field);
             if (opt.type != 'hidden') {
-                htmlForm.push('<div class="form-group">');
+                htmlForm.push('<div class="form-group" id="group_'+id+'_'+opt.field+'"">');
                 htmlForm.push('<label class="col-sm-4 control-label">'+opt.title+'</label>');
                 htmlForm.push('<div class="col-sm-6">');
             }

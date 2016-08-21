@@ -27,8 +27,8 @@ class CreateOwStationsTable extends Migration
             $table->unsignedBigInteger('sta_id');
             $table->foreign('sta_id')->references('id')->on('ow_stations')->onDelete('cascade');;
 
-            $table->timestamp('lastonline');
-            $table->unsignedBigInteger('lastondev_id');
+            $table->timestamp('last_online');
+            $table->string('last_ondev', 20);
             $table->string('comment', 256);
 
             $table->timestamps();

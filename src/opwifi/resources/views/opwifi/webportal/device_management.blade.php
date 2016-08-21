@@ -69,8 +69,9 @@
                     }, {
                         field: 'device.name',
                         title: '名称',
-                        editable: true,
-                        sortable: true,
+                        editable: {
+                            url: "{{ '/'.Request::path().'/update' }}",
+                        },
                     }, {
                         field: 'config.name',
                         title: '绑定配置',
