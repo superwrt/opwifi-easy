@@ -10,6 +10,8 @@ use App\Models\OwDevices;
 use App\Models\OwDevicemeta;
 use App\Models\OwDevConfigs;
 use App\Models\OwDevFirmwares;
+use App\Models\OwStations;
+use App\Models\OwStationmeta;
 use App\Models\OwSystem;
 
 use App\Http\Middleware\HttpSignatures;
@@ -24,19 +26,17 @@ class DeviceServController extends Controller {
 	private $enCrypted = array();
 
 	private function getAesKey($req) {
-		if (isset($req['crypto']) && isset($req['crypto']['key'])) {
+		try {
 			$key = $req['crypto']['key'];
-			if (isset($key['type']) && $key['type'] == 'aes_128_cbc') {
+			if ($key['type'] == 'aes_128_cbc') {
 				$aesKey = null;
-				if (isset($key['key_rsa'])){
-					$privKey = HttpSignatures::getPrivKey();
-					if ($privKey) {
-						if (openssl_private_decrypt(base64_decode($key['key_rsa']), $aesKey, $privKey))
-							return $aesKey;
-					}
+				$privKey = HttpSignatures::getPrivKey();
+				if ($privKey) {
+					if (openssl_private_decrypt(base64_decode($key['key_rsa']), $aesKey, $privKey))
+						return $aesKey;
 				}
 			}
-		}
+		} catch(Exception $e) {}
 		return null;
 	}
 
@@ -63,13 +63,11 @@ class DeviceServController extends Controller {
 		$aesKey = $this->getAesKey($req);
 		if (!$aesKey)
 			return null;
-		if (isset($req['crypto']['data'])) {
+		try {
 			$d = $req['crypto']['data'];
-			if (isset($d['iv']) && isset($d['ctx'])) {
-				$ctx = base64_decode($d['ctx']);
-				return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $aesKey, $ctx, MCRYPT_MODE_CBC, $d['iv']));
-			}
-		}
+			$ctx = base64_decode($d['ctx']);
+			return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $aesKey, $ctx, MCRYPT_MODE_CBC, $d['iv']));
+		} catch(Exception $e) {}
 		return null;
 	}
 
@@ -88,10 +86,41 @@ class DeviceServController extends Controller {
 		return $arr;
 	}
 
+	private function updateStationStat($stat) {
+		foreach ($stat as $wlan) {
+			foreach ($wlan["stations"] as $sta) {
+				try {
+					$meta = [
+						'last_show' => date("Y-m-d H:i:s",time()),
+						'last_ondev' => $this->devMac,
+						'last_onbssid' => $wlan['bssid'],
+						'last_onssid' => $wlan['ssid'],
+						'last_signal' => $sta['signal'],
+						'last_txbytes' => $sta['tx_bytes'],
+						'last_txbytes' => $sta['rx_bytes'],
+					];
+					$osta = OwStations::firstOrCreate(['mac' => $sta['mac']]);
+					if ($osta) {
+						$resm = $osta->meta()->first();
+						if ($resm) {
+							$resm->update($meta);
+						} else {
+							$resm = $osta->meta()->create($meta);
+						}
+					}
+				} catch(\ErrorException $e) {
+					/* Station maybe not include some item, skip it */
+					Log::debug("Update Station status error:".$e->getMessage());
+				}
+			}
+		}
+	}
+
 	private function updateDevInfo($req, $ip) {
 		if (!isset($req['mac'])) {
 			return false;
 		}
+		$this->devMac = $req['mac'];
 
 		Log::info("Update Device Info:".var_export($req, true));
 
@@ -112,22 +141,30 @@ class DeviceServController extends Controller {
 			'online' => true
 		]);
 
-		$res = OwDevices::where('mac', $req['mac'])->first();
+		$res = OwDevices::firstOrCreate(['mac' => $req['mac']]);
 		if ($res) {
 			$resm = $res->meta()->first();
 			if ($resm) {
 				$resm->update($meta);
 			} else {
-				$resm = $res->meta()->updateOrCreate($meta);
+				$resm = $res->meta()->create($meta);
 			}
-			$this->meta = $resm;
-		} else {
-			$dev = ['mac' => $req['mac']];
-			$res = OwDevices::create($dev);
-			$resm = $res->meta()->updateOrCreate($meta);
 			$this->meta = $resm;
 		}
 		return;
+	}
+
+	private function updateOperationStatus($status)
+	{
+		foreach ($status as $st) {
+			if ($st["status"] != "success")
+				continue;
+			switch ($st["name"]) {
+			case "wlan.stations":
+				$this->updateStationStat($st["result"]["status"]);
+				break;
+			}
+		}
 	}
 
 	private function updateOperation($req) {
@@ -141,6 +178,10 @@ class DeviceServController extends Controller {
 			//Check return set_sha1!!
 			if (isset($cfg['set_ret']) && $cfg['set_ret']) {
 				DeviceConfigApply::devmeta($this->meta)->update($this->configSha1);
+			}
+
+			if (isset($cfg['status']) && is_array($cfg['status'])) {
+				$this->updateOperationStatus($cfg['status']);
 			}
 		}
 	}
@@ -166,27 +207,7 @@ class DeviceServController extends Controller {
 				$this->meta->update(['op_configed_last' => date("Y-m-d H:i:s",time())]);
 			}
 		}
-/*
-		if ($this->isFit &&
-				$this->meta['op_config_id']) {//Only support Fit now!
-			$cfg = $this->meta->config()->first();
-			if ($cfg) {
-				if (isset($this->devParam['fit_config_md5'])) {
-					if ($this->devParam['fit_config_md5'] != $cfg['md5']) {
-						//先按简单方式，重启设备，重新加载。
-						$reboot = true;
-					}
-				} else if ($cfg['config']){
-					$this->enCrypted['config'] = array(
-						'set' => json_decode($cfg['config']),
-					);
-					$this->enCrypted['param'] = array(
-						'fit_config_md5' => $cfg['md5'],
-					);
-				}
-			}
-		}
-*/
+
 		if ($this->meta['op_reboot'] || $reboot) {
 			if (!isset($rep['config'])) $rep['config'] = array();
 			if (!isset($rep['config']['task'])) $rep['config']['task'] = array();
@@ -208,6 +229,18 @@ class DeviceServController extends Controller {
 				);
 			} else {
 				$this->meta->update(['op_upgrade_id'=>null]);
+			}
+		}
+
+		if (isset($req['count']) && $req['count'] == 0) {
+			if(!isset($req['config']) || !isset($req['config']['status'])) {
+				$report = [ 'status'=>[] ];
+				if (OwSystem::getValue('fn_sta_status')) {
+					$report['status'][] = ["name" => "wlan.stations"];
+				}
+				if (count($report['status']) > 0) {
+					$rep['config']['report'] = $report;
+				}
 			}
 		}
 	}
@@ -240,6 +273,9 @@ class DeviceServController extends Controller {
 			$rep['date'] = [
 					"set" => gmdate("Y-m-d H:i:s",time()),
 				];
+		}
+		if (isset($req['seq'])) {
+			$rep['seq'] = $req['seq'];
 		}
 
 		$this->appendOperation($req, $rep);

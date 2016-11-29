@@ -14,7 +14,7 @@ class OwWebportalUsers extends Model
 
     public function setPasswordAttribute($value)
     {
-    	if ($value) $this->attributes['shadow'] = md5($value);
+    	if ($value) $this->attributes['shadow'] = md5("opwifi"+$value);
     	unset($this->attributes['password']);
     }
 }

@@ -29,13 +29,15 @@
 
             .title {
                 font-size: 96px;
+                color: #111;
+                text-decoration: none;
             }
         </style>
     </head>
     <body>
         <div class="container">
             <div class="content">
-                <div class="title">OpWiFi</div>
+                <a class="title" href="/m">OpWiFi</a>
             </div>
         </div>
     </body>

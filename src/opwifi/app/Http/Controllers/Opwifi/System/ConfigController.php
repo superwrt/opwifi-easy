@@ -16,7 +16,7 @@ class ConfigController extends Controller {
     {
     }
 
-    private $config_items = ['site_url'];
+    private $config_items = ['site_url', 'fn_sta_status'];
 
     private function loadConfigs() {
     	$this->viewData['configs'] = OwSystem::getValue($this->config_items);

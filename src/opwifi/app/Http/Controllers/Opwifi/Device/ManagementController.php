@@ -14,7 +14,7 @@ use App\Models\OwDevtagRelationships;
 
 use App\Http\Helpers\Opwifi\SqlFakeScheduler;
 
-class MangementController extends OwCRUDController {
+class ManagementController extends OwCRUDController {
 
 	protected $viewData = array(
 	);

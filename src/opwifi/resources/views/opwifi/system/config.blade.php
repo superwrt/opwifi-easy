@@ -19,6 +19,14 @@
     </div>
   </div>
   <div class="form-group">
+    <label for="inputStatSta" class="col-sm-2 control-label">统计终端信息</label>
+    <div class="checkbox col-sm-9">
+      <label>
+        <input type="checkbox" id="inputStatSta" name="fn_sta_status" value="on" <?php if($configs['fn_sta_status']=='on'){echo('checked');} ?> > 开启
+      </label>
+    </div>
+  </div>
+  <div class="form-group">
     <div class="col-sm-offset-2 col-sm-9">
       <button type="submit" class="btn btn-success">保存更改</button>
     </div>

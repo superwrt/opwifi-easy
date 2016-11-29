@@ -9,7 +9,7 @@
 
     <!-- Styles -->
     <link href="/res/css/bootstrap.min.css" rel="stylesheet">
-    {{-- <link href="{{ elixir('css/app.css') }}" rel="stylesheet"> --}}
+    <link href="/res/css/auth.css" rel="stylesheet">
 
     <style>
         body {
@@ -39,28 +39,6 @@
                     OpWiFi
                 </a>
             </div>
-
-            <div class="collapse navbar-collapse" id="app-navbar-collapse">
-                <!-- Left Side Of Navbar -->
-                <ul class="nav navbar-nav">
-                </ul>
-
-                <!-- Right Side Of Navbar -->
-                <ul class="nav navbar-nav navbar-right">
-                    <!-- Authentication Links -->
-                    @if (!Auth::guest())
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                {{ Auth::user()->name }} <span class="caret"></span>
-                            </a>
-
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="{{ url('m/auth/logout') }}"><i class="fa fa-btn fa-sign-out"></i>注销</a></li>
-                            </ul>
-                        </li>
-                    @endif
-                </ul>
-            </div>
         </div>
     </nav>
 
@@ -69,6 +47,5 @@
     <!-- JavaScripts -->
     <script src="/res/js/jquery-1.12.3.min.js"></script>
     <script src="/res/js/bootstrap.min.js"></script>
-    {{-- <script src="{{ elixir('js/app.js') }}"></script> --}}
 </body>
 </html>

@@ -156,9 +156,9 @@ class InstallController extends Controller
      */
     public function getDatabase()
     {
-        $msg = $this->databaseManager->migrateAndSeed();
+        $message = $this->databaseManager->migrateAndSeed();
 
-        return view('installer.finished', $msg);
+        return view('installer.finished', compact('message'));
         // return redirect()->route('Installer::final')
         //                  ->with(['message' => $response]);
     }

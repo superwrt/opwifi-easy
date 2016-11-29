@@ -45,7 +45,7 @@ class OwSystem extends Model
     	    		$it->save();
                 }
 	    	} else {
-	    		self::create(['name'=>$k, 'value'=>$v, 'model'=>'auto']);
+	    		self::create(['name'=>$k, 'value'=>$v, 'module'=>'auto']);
 	    	}
     	}
     }

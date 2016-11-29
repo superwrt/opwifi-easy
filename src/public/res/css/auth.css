@@ -1,0 +1,20 @@
+body {
+	background: #F5F7FA;
+}
+.panel {
+	text-align: center;
+	min-width: 260px;
+	max-width: 420px;
+	margin: 10% auto;
+}
+
+.panel-heading {
+  text-align: center;
+  font-size: 32px;
+  font-family: "Open Sans",sans-serif;
+}
+
+.panel-default>.panel-heading {
+  border: 0;
+  background: #fff;
+}

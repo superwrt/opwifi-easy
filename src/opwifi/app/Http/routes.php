@@ -26,7 +26,7 @@ Route::controller('m/auth', 'Auth\AuthController');
 Route::group(['prefix' => 'm/device', 'namespace' => 'Opwifi\Device',
     'as' => 'opwifi::', 'middleware' => 'auth'], function()
 {
-    Route::controller('management', 'MangementController', ['getIndex' => 'device.management']);
+    Route::controller('management', 'ManagementController', ['getIndex' => 'device.management']);
     Route::controller('firmware', 'FirmwareController', ['getIndex' => 'device.firmware']);
     Route::controller('config', 'ConfigController', ['getIndex' => 'device.config']);
 });
@@ -34,10 +34,7 @@ Route::group(['prefix' => 'm/device', 'namespace' => 'Opwifi\Device',
 Route::group(['prefix' => 'm/station', 'namespace' => 'Opwifi\Station',
     'as' => 'opwifi::', 'middleware' => 'auth'], function()
 {
-    Route::controller('/', 'StationController', [
-        'getManagement' => 'station.management',
-        'getStatus' => 'station.status',
-        ]);
+    Route::controller('management', 'ManagementController', ['getIndex' => 'station.management']);
 });
 
 Route::group(['prefix' => 'm/webportal', 'namespace' => 'Opwifi\Webportal',

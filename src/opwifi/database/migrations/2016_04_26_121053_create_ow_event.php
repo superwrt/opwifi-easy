@@ -39,6 +39,14 @@ INSERT INTO ow_webportal_devices( dev_id, created_at, updated_at ) VALUES (NEW.i
 END
         ');
 
+        DB::unprepared('
+CREATE TRIGGER `owNewStation` AFTER INSERT ON  `ow_stations` 
+FOR EACH
+ROW BEGIN
+INSERT INTO ow_stationmeta( sta_id, created_at, updated_at ) VALUES (NEW.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+END
+        ');
+
     }
 
     /**

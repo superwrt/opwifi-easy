@@ -15,7 +15,6 @@
 			] ],
 		['name' => 'stations', 'string' => '终端', 'url' => '#', 'iconClass' => 'glyphicon glyphicon-phone', 'sub' => [
 				['name' => 'station_mng', 'string' => '终端管理', 'url' => URL::route('opwifi::station.management') ],
-				['name' => 'station_st', 'string' => '终端状态', 'url' => URL::route('opwifi::station.status') ],
 			] ],
 		['name' => 'system', 'string' => '系统', 'url' => '#', 'iconClass' => 'glyphicon glyphicon-cog','sub' => [
 				['name' => 'config', 'string' => '系统配置', 'url' => URL::route('opwifi::system.config') ],

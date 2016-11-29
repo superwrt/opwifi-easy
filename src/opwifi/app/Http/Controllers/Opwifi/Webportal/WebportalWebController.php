@@ -50,13 +50,14 @@ class WebportalWebController extends Controller {
 			return view("opwifi.webportal.web.failed", array_merge($this->viewData,
 				['error'=>'请求未管理的设备。']));
 		}
+		Log::notice(var_export($cfg['mode'], true));
 		if ($cfg['mode'] == 'login') {
 			$ckUser = ['username', 'password'];
 			if ($request->has($ckUser)) {
 				$in = $request->only($ckUser);
 				$user = OwWebportalUsers::where('username', $input['username'])->first();
 				if ($user) {
-					$pwd = UserController::passwordShadow($input['username'], $input['password']);
+					$pwd = md5("opwifi"+$input['password']);
 				}
 			}
 			if (!$user || $pwd != $user['shadow']) {

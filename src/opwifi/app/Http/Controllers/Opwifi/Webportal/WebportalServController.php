@@ -139,9 +139,9 @@ class WebportalServController extends Controller {
             }
             if (preg_match('@^(?:http|https)://([^/:]+)@i', $jcfg['redirect'], $addr)) {
                 if (filter_var($addr[1], FILTER_VALIDATE_IP)) {
-                    $jcfg['white_ip'] = $addr[1].(strlen($jcfg['white_ip'])>0?','.$jcfg['white_ip']:'');
+                    $jcfg['white_ip'][] = $addr[1];
                 } else {
-                    $jcfg['white_domain'] = $addr[1].(strlen($jcfg['white_domain'])>0?','.$jcfg['white_domain']:'');
+                    $jcfg['white_domain'][] = $addr[1];
                 }
             }
 
@@ -179,7 +179,7 @@ class WebportalServController extends Controller {
         if ($user && $user->force_timeout) {
             $tmout = $user->force_timeout;
         } else {
-            $tmout = $wpConfig->force_timeout;
+            $tmout = $this->wpConfig->force_timeout;
         }
         if (!$tmout) {
             /* 正常不应该走到这里，不允许超过30天。 */
@@ -187,7 +187,7 @@ class WebportalServController extends Controller {
         }
 
         $st = ['authed' => true, 'online' => true,
-            'ondev' => $devMac, 'authdev_id' => $wpDev->id,
+            'ondev' => $this->devMac, 'authdev_id' => $this->wpDev->id,
             'last_auth' => date("Y-m-d H:i:s",time()),
             'last_deadline' => date("Y-m-d H:i:s", time() + $tmout),
             'user_id' => $user ? $user->id : null,
@@ -334,8 +334,8 @@ class WebportalServController extends Controller {
 		if ($oldSt) {
             $authdev = $oldSt->authdev()->first();
             $isAuthdev = $authdev && $authdev->device->first()['mac'] == $this->devMac;
-            if ($st['online'] && $wpConfig &&
-                    (($wpConfig->roaming && $oldSt['authed']) ||
+            if ($st['online'] && $this->wpConfig &&
+                    (($this->wpConfig->roaming && $oldSt['authed']) ||
                      $isAuthdev)) {
                 /* 处理允许漫游和设备意外重启。 */
                 if (time() < $oldSt->last_deadline) {
@@ -417,10 +417,11 @@ class WebportalServController extends Controller {
     		if (isset($args['mac'], $args['username']) &&
     			$usermac == $args['usermac']) {
 
-    			if (isset($args['token']) && is_string($cf['token'])) {
+    			if (isset($args['token']) && is_string($args['token'])) {
     				$tk = OwWebportalTokens::where('token', $args['token'])->first();
     				if ($tk) {
-    					$redirect = $tk['redirect'];
+                        if ($tk['redirect'])
+    					   $redirect = $tk['redirect'];
                         $permit = true;
                         /* Check trx_limit, when login */
     					$this->stationPermit($usermac, $tk);
@@ -467,6 +468,7 @@ class WebportalServController extends Controller {
     		$wpdev->update($online);
     	}
     	$this->wpDev = $wpdev;
+        $this->wpConfig = $wpdev->config()->first();
     }
 
     /**

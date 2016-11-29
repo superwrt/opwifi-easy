@@ -16,7 +16,7 @@ class CreateOwSystemTable extends Migration
             $table->engine = 'MyISAM';
             $table->increments('id');
             $table->string('name',128)->unique()->index();
-            $table->text('value');
+            $table->text('value')->nullable();
             $table->string('module',64);
             $table->timestamps();
         });

@@ -16,6 +16,7 @@ class CreateOwDevicesTable extends Migration
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->string('mac',20)->unique()->index();//Add space for same mac address device!
+            $table->string('uid',40);
             $table->boolean('shared');//Devices have same mac address!
             $table->string('name',128);
 
