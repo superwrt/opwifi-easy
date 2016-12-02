@@ -56,9 +56,7 @@
             success: function(r) {
                 if (r)
                     $.opwifi.opalert($('#owcontent'), 'success');
-                $('#jstree_group').jstree({
-                    "core" : {'data' : r}
-                });
+                ref.refresh();
             },
             error: function(e) {
                 $.opwifi.opalert($('#owcontent'), 'error');
@@ -72,7 +70,7 @@
         var macs = [];
         var ops = [];
         for (i in devs) {
-            macs[macs.length] = devs[i].device.mac;
+            macs[macs.length] = devs[i].{{ $rootNode }}.mac;
         }
         if (op == "remove") {
             for (i in tag_ids) {

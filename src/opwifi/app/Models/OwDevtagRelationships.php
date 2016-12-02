@@ -50,7 +50,10 @@ class OwDevtagRelationships extends Model
 					} else {
 						$dev_id = $mac;
 					}
-					if ($dev_id && self::insertGetId(['tag_id' => $tag_id, 'dev_id' => $dev_id])) {
+					$data = ['tag_id' => $tag_id, 'dev_id' => $dev_id];
+					if (self::where($data)->count() > 0) {
+						//Has one, skip.
+					} else if ($dev_id && self::insertGetId($data)) {
 						$done++;
 					}
 				}
@@ -66,7 +69,7 @@ class OwDevtagRelationships extends Model
 					} else {
 						$dev_id = $mac;
 					}
-					if ($dev_id && self::where('tag_id', $tag_id)->where('dev_id', $dev_id)->delete()) {
+					if ($dev_id && self::where(['tag_id' => $tag_id, 'dev_id' => $dev_id])->delete()) {
 						$done++;
 					}
 				}

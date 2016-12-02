@@ -155,6 +155,7 @@
         'tableId' => 'stastable',
         'tableUrl' => '/'.Request::path().'/select',
         'groupUrl' => '/'.Request::path().'/groups',
+        'rootNode' => 'station',
         'relationshipUrl' => '/'.Request::path().'/tag-relationships',
     ])
 

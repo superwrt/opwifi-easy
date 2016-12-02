@@ -78,6 +78,7 @@ class CreateOwDevicesTable extends Migration
 
             $table->boolean('op_reboot');
             $table->unsignedInteger('op_upgrade_id')->nullable();
+            $table->unsignedInteger('op_upgrade_trys');
             $table->foreign('op_upgrade_id')->references('id')->on('ow_dev_firmwares')->onDelete('set null');
 
             $table->timestamps();

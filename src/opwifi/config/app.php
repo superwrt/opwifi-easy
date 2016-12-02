@@ -94,9 +94,13 @@ return [
     |
     | Available Settings: "single", "daily", "syslog", "errorlog"
     |
+    | Terra add log-level config. Available Settings:
+    |   "emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"
     */
 
-    'log' => env('APP_LOG', 'single'),
+    'log' => env('APP_LOG', 'daily'),
+
+    'log-level' => 'info',
 
     /*
     |--------------------------------------------------------------------------

@@ -36,7 +36,7 @@ abstract class OwCRUDController extends Controller
 			$ids = array();
 			$rales = $this->newOwnModelTagRelationships()->whereIn('tag_id', explode(',',$tag_ids))->get();
 			foreach ($rales as $ra) {
-				$ids[] = $ra->dev_id;
+				$ids[] = $ra[$this->indexOwnModelTag];
 			}
 			$ids = array_unique($ids);
 			$query = $query->whereIn($this->indexOwnModelTag, $ids);

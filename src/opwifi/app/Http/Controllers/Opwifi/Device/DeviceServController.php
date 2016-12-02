@@ -88,6 +88,8 @@ class DeviceServController extends Controller {
 
 	private function updateStationStat($stat) {
 		foreach ($stat as $wlan) {
+			if (!isset($wlan["stations"]))
+				continue;
 			foreach ($wlan["stations"] as $sta) {
 				try {
 					$meta = [
@@ -218,7 +220,8 @@ class DeviceServController extends Controller {
 
 		if ($this->meta['op_upgrade_id']){
 			$fw = $this->meta->upgrade()->first();
-			if ($fw && $this->meta['m_fullver'] != $fw['version']) {
+			if ($fw && $this->meta['m_fullver'] != $fw['version'] &&
+				$this->meta['op_upgrade_trys'] != 1) {
 				$rep['upgrade'] = array(
 					"firmware"=> [
 						"upgrade"=> [
@@ -227,8 +230,14 @@ class DeviceServController extends Controller {
 						]
 					]
 				);
+				if ($this->meta['op_upgrade_trys'] == 0) {
+					$this->meta->op_upgrade_trys = 5;
+				} else {
+					$this->meta->op_upgrade_trys--;
+				}
+				$this->meta->save();
 			} else {
-				$this->meta->update(['op_upgrade_id'=>null]);
+				$this->meta->update(['op_upgrade_id'=>null, 'op_upgrade_trys'=>0]);
 			}
 		}
 
