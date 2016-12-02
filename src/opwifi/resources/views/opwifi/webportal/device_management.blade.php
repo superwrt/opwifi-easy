@@ -138,6 +138,7 @@
         'tableId' => 'devstable',
         'tableUrl' => '/'.Request::path().'/select',
         'groupUrl' => '/m/device/management/groups',
+        'rootNode' => 'device',
         'relationshipUrl' => 'tag-relationships',
     ])
 

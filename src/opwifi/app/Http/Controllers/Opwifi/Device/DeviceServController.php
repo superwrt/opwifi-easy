@@ -99,7 +99,7 @@ class DeviceServController extends Controller {
 						'last_onssid' => $wlan['ssid'],
 						'last_signal' => $sta['signal'],
 						'last_txbytes' => $sta['tx_bytes'],
-						'last_txbytes' => $sta['rx_bytes'],
+						'last_rxbytes' => $sta['rx_bytes'],
 					];
 					$osta = OwStations::firstOrCreate(['mac' => $sta['mac']]);
 					if ($osta) {
