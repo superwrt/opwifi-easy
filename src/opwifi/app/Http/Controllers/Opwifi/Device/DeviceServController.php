@@ -163,7 +163,8 @@ class DeviceServController extends Controller {
 				continue;
 			switch ($st["name"]) {
 			case "wlan.stations":
-				$this->updateStationStat($st["result"]["status"]);
+				if (isset($st["result"]))
+					$this->updateStationStat($st["result"]["status"]);
 				break;
 			}
 		}

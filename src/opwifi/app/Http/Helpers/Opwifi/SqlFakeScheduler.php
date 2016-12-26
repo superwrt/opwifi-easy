@@ -13,11 +13,11 @@ class SqlFakeScheduler
         ['name'=>'owOutDevOnline', 'comment'=>'Update Online status', 'every'=>'10 MINUTE', 'sql'=>'
 UPDATE `ow_devicemeta` SET `online` =\'0\', `updated_at` = CURRENT_TIMESTAMP WHERE `online` =\'1\' AND TIMESTAMPDIFF(MINUTE, lastshow, CURRENT_TIMESTAMP) > 20;
 UPDATE `ow_webportal_devices` SET `online` =\'0\', `updated_at` = CURRENT_TIMESTAMP WHERE `online` =\'1\' AND  TIMESTAMPDIFF(MINUTE, lastshow, CURRENT_TIMESTAMP) > 10;
-        '],
+'],
         ['name'=>'owCleaner', 'comment'=>'Clean unneed resource', 'every'=>'1 DAY', 'start'=>'2000-01-01 02:30:00', 'sql'=>'
 DELETE FROM `ow_webportal_tokens` WHERE TIMESTAMPDIFF(DAY, updated_at, CURRENT_TIMESTAMP) > 1;
 DELETE FROM `ow_webportal_station_status` WHERE TIMESTAMPDIFF(MONTH, updated_at, CURRENT_TIMESTAMP) > 1;
-        '],
+'],
     	];
 	}
 
@@ -50,7 +50,7 @@ DELETE FROM `ow_webportal_station_status` WHERE TIMESTAMPDIFF(MONTH, updated_at,
 		$ss = self::getRules();
 		foreach ($ss as $s) {
 			$done = isset($arr[$s['name']])?$arr[$s['name']]:0;
-			$last = strtotime(strtolower($s['every']).' age');
+			$last = strtotime(strtolower($s['every']).' ago');
 			if ($last < $done) {
 				continue;
 			}
