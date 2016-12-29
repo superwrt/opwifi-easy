@@ -26,10 +26,12 @@
             </div>
             <input id="uploadFileID"  type="hidden" name="id" value="">
             {!! csrf_field() !!}
-            <div class="form-group"><input id="cfg_add" type="submit" class="btn btn-success" name="submit">提交</input></div>
         </div>
         </form>
     </div>
     <div class="panel-footer">
+        <div id="uploadFileProgress" class="progress">
+            <div class="progress-bar progress-bar-success"></div>
+        </div>
     </div>
 </div>

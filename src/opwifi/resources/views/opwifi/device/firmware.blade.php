@@ -42,6 +42,7 @@
 @section('header_css')
     <link rel="stylesheet" href="/res/pkgs/jstree/themes/default/style.min.css">
 	<link rel="stylesheet" href="/res/pkgs/bootstrap-table/bootstrap-table.css">
+    <link rel="stylesheet" href="/res/pkgs/jquery-ui/jquery-ui.css">
 @endsection
 @section('footer_js')
 	<script src="/res/pkgs/bootstrap-table/bootstrap-table.js"></script>
@@ -50,6 +51,8 @@
 	<script src="/res/pkgs/bootstrap-table/bootstrap-table-editable.js"></script>
 	<script src="/res/pkgs/bootstrap-table/extensions/toolbar/bootstrap-table-toolbar.js"></script>
     <script src="/res/js/jquery.form.js"></script>
+    <script src="/res/pkgs/jquery-ui/jquery-ui.js"></script>
+    <script src="/res/js/jquery.fileupload.js"></script>
 	<script src="/res/js/opwifi_upload_file.js"></script>
 
 	<script type="text/javascript">

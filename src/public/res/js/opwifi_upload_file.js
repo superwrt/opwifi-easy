@@ -10,34 +10,36 @@ $(function(){
     })
 
     $.fn.uploadFile = function(id, success){
-        $('#uploadFileForm').submit(function(){
-            $('#uploadFileForm').ajaxSubmit({
-                dataType: 'json',
-                beforeSubmit: function () {
-                        $("#validation-errors").hide().empty();
-                        $("#output").css('display','none');
-                        return true;
-                    },
-                success: function (response) {
-                    if(response.success == false) {
-                        var responseErrors = response.errors;
-                        $.each(responseErrors, function(index, value){
-                            if (value.length != 0) {
-                                $.opwifi.opalert($('#owcontent'), 'warning', value);
-                            }
-                        });
-                        $.opwifi.opalert($('#owcontent'), 'warning');
-                    } else {
-                        $('.upload-file-mask').hide();
-                        $('.upload-file').hide();
+        $('#uploadFileProgress .progress-bar').css('width','0%');
+        $('#uploadFileForm').fileupload({
+            dataType: 'json',
+            done: function (e, data) {
+                if(data.success == false) {
+                    var responseErrors = data.errors;
+                    $.each(responseErrors, function(index, value){
+                        if (value.length != 0) {
+                            $.opwifi.opalert($('#owcontent'), 'warning', value);
+                        }
+                    });
+                    $.opwifi.opalert($('#owcontent'), 'warning');
+                } else {
+                    $('.upload-file-mask').hide();
+                    $('.upload-file').hide();
 
-                        $.opwifi.opalert($('#owcontent'), 'success');
-                        if (success) success(response);
-                    }
+                    $.opwifi.opalert($('#owcontent'), 'success');
+                    if (success) success(data);
                 }
-            });
-            return false;
-        });
+            },
+            progressall: function (e, data) {
+                var progress = parseInt(data.loaded / data.total * 100, 10);
+                $('#uploadFileProgress .progress-bar').css(
+                    'width',
+                    progress + '%'
+                );
+            }
+        }).prop('disabled', !$.support.fileInput)
+            .parent().addClass($.support.fileInput ? undefined : 'disabled');
+
         $(this).click(function(){
             $('.upload-file-mask').show();
             $('.upload-file').show();
