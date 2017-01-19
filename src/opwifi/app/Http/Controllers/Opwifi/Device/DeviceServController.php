@@ -197,9 +197,9 @@ class DeviceServController extends Controller {
 		/* For test */
 		/* end */
 
-		if ($this->meta->op_config_id &&
-				$this->configSha1) {
-			/* 简单处理，如果更改过，就进行下发 */
+		if ($this->meta->op_config_id && $this->configSha1 &&
+				isset($req['count']) && $req['count'] == 0) {
+			/* 简单处理，如果更改过，就进行下发。只第一次上报时下发，防止一直循环。 */
 			$setting = DeviceConfigApply::devmeta($this->meta)->check($this->configSha1);
 			if ($setting) {
 				$this->enCrypted['config'] = array(
@@ -221,7 +221,7 @@ class DeviceServController extends Controller {
 
 		if ($this->meta['op_upgrade_id']){
 			$fw = $this->meta->upgrade()->first();
-			if ($fw && $this->meta['m_fullver'] != $fw['version'] &&
+			if ($fw && $this->meta['fullver'] != $fw['version'] &&
 				$this->meta['op_upgrade_trys'] != 1) {
 				$rep['upgrade'] = array(
 					"firmware"=> [

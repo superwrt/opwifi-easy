@@ -58,7 +58,7 @@ class FirmwareController extends Controller {
 
 	public function postUpload(Request $request) {
 		if (!$request->hasFile('file')) {
-	        return response()->json(['error' => 'No file in submit.' ]);
+	        return response()->json(['errors' => ['No file in submit.'] ]);
 		}
         $file = $request->file('file');
         $name = $request->get('name');
@@ -66,7 +66,7 @@ class FirmwareController extends Controller {
         $allowed_extensions = ["bin", "img", "spkg"];
         if ($file->getClientOriginalExtension() &&
         		!in_array($file->getClientOriginalExtension(), $allowed_extensions)) {
-            return response()->json(['error' => 'You may only upload spkg, bin or img.']);
+            return response()->json(['errors' => ['You may only upload spkg, bin or img.']]);
         }
 
         $extension = $file->getClientOriginalExtension();

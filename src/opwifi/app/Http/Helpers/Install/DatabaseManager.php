@@ -46,10 +46,10 @@ class DatabaseManager
             Artisan::call('db:seed');
         }
         catch(Exception $e){
-            return $e->getMessage();
+            return $this->response($e->getMessage());
         }
 
-        return trans('installer.final.finished');
+        return $this->response(trans('installer.final.finished'), 'success');
     }
 
     /**

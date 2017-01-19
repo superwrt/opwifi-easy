@@ -101,6 +101,6 @@ class DeviceConfigApply
 	}
 
 	public function update($sha1) {
-		$meta->update(['op_configed_sha1' => $sha1]);
+		$this->devMeta->update(['op_configed_sha1' => $sha1]);
 	}
 }

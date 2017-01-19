@@ -30,22 +30,25 @@ ON COMPLETION PRESERVE ENABLE
 DO BEGIN '.$s['sql'].' END;');
         }
 
-        DB::unprepared('
+        try {
+            /* When mysql enable binlog, need SUPER privilege. Skip, let script do it! */
+            DB::unprepared('
 CREATE TRIGGER `owNewDevice` AFTER INSERT ON  `ow_devices` 
 FOR EACH
 ROW BEGIN
 INSERT INTO ow_devicemeta( dev_id, created_at, updated_at ) VALUES (NEW.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO ow_webportal_devices( dev_id, created_at, updated_at ) VALUES (NEW.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 END
-        ');
+            ');
 
-        DB::unprepared('
+            DB::unprepared('
 CREATE TRIGGER `owNewStation` AFTER INSERT ON  `ow_stations` 
 FOR EACH
 ROW BEGIN
 INSERT INTO ow_stationmeta( sta_id, created_at, updated_at ) VALUES (NEW.id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 END
-        ');
+            ');
+        } catch (\Exception $e) {};
 
     }
 
@@ -56,6 +59,7 @@ END
      */
     public function down()
     {
+        DB::unprepared('DELETE TRIGGER owNewStation');
         DB::unprepared('DELETE TRIGGER owNewDevice');
         $ss = SqlFakeScheduler::getRules();
         foreach ($ss as $s) {

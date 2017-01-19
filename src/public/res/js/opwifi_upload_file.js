@@ -14,20 +14,22 @@ $(function(){
         $('#uploadFileForm').fileupload({
             dataType: 'json',
             done: function (e, data) {
-                if(data.success == false) {
-                    var responseErrors = data.errors;
+                var res = data.result;
+                if(res.success == false || res.errors != undefined) {
+                    var responseErrors = res.errors;
                     $.each(responseErrors, function(index, value){
                         if (value.length != 0) {
                             $.opwifi.opalert($('#owcontent'), 'warning', value);
                         }
                     });
-                    $.opwifi.opalert($('#owcontent'), 'warning');
+                    if (res.errors.length == 0)
+                        $.opwifi.opalert($('#owcontent'), 'warning');
                 } else {
                     $('.upload-file-mask').hide();
                     $('.upload-file').hide();
 
                     $.opwifi.opalert($('#owcontent'), 'success');
-                    if (success) success(data);
+                    if (success) success(res);
                 }
             },
             progressall: function (e, data) {
