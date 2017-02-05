@@ -79,17 +79,22 @@ class DeviceConfigApply
 
 	public function check($sha1) {
 		$meta = $this->devMeta;
-
 		$cfg = $meta->config()->first();
-		if ($cfg && $cfg->pdata) {
+
+		if (!$cfg ||
+				($sha1 == $meta->op_configed_sha1 &&
+				$meta->op_configed_last > $cfg->updated_at)) {
+			return null;
+		}
+
+		if ($cfg->pdata) {
 			$pdata = json_decode($cfg->pdata, true);
 			if (isset($pdata['config'])) {
 				$config = $pdata['config'];
 			}
 		}
 		
-		if ($config && $meta &&
-				$sha1 != $meta->op_configed_sha1) {
+		if ($config) {
 			$setting = $this->getSetting('/', $config);
 			if (count($setting) > 0) {
 				return $setting;

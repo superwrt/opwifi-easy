@@ -29,12 +29,8 @@ class ManagementController extends OwCRUDController {
     }
     protected function createOwnModelRoot($cfg) {
     	$dev = OwDevices::create($cfg);
-    	if (!$dev->meta()->first()) {
-    		$dev->meta()->create([]);
-    	}
-    	if (!$dev->webportal()->first()) {
-    		$dev->webportal()->create([]);
-    	}
+    	$dev->meta()->firstOrCreate([]);
+    	$dev->webportal()->firstOrCreate([]);
     }
     protected $indexOwnModelTag = 'dev_id';
     protected function newOwnModelTagRelationships() {

@@ -29,9 +29,7 @@ class ManagementController extends OwCRUDController {
     }
     protected function createOwnModelRoot($cfg) {
     	$sta = OwStations::create($cfg);
-    	if (!$sta->meta()->first()) {
-    		$sta->meta()->create([]);
-    	}
+    	$sta->meta()->firstOrCreate([]);
     }
     protected $indexOwnModelTag = 'sta_id';
     protected function newOwnModelTagRelationships() {
