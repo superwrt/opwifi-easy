@@ -27,6 +27,15 @@ class ManagementController extends OwCRUDController {
     protected function newOwnModel() {
     	return OwDevicemeta::with('device')->with('config')->with('upgrade');
     }
+    protected function createOwnModelRoot($cfg) {
+    	$dev = OwDevices::create($cfg);
+    	if (!$dev->meta()->first()) {
+    		$dev->meta()->create([]);
+    	}
+    	if (!$dev->webportal()->first()) {
+    		$dev->webportal()->create([]);
+    	}
+    }
     protected $indexOwnModelTag = 'dev_id';
     protected function newOwnModelTagRelationships() {
         return new OwDevtagRelationships();

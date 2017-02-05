@@ -27,6 +27,12 @@ class ManagementController extends OwCRUDController {
     protected function newOwnModel() {
     	return OwStationmeta::with('station');
     }
+    protected function createOwnModelRoot($cfg) {
+    	$sta = OwStations::create($cfg);
+    	if (!$sta->meta()->first()) {
+    		$sta->meta()->create([]);
+    	}
+    }
     protected $indexOwnModelTag = 'sta_id';
     protected function newOwnModelTagRelationships() {
         return new OwStatagRelationships();

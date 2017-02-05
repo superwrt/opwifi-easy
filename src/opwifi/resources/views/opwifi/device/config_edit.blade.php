@@ -244,8 +244,7 @@ include(base_path('resources/views/opwifi/common.php'));
               title: '接口'
             }, {
               field: '_v.ssid.v',
-              title: 'SSID',
-              editable: true
+              title: 'SSID'
             }, {
               field: '_v.enable.v',
               title: '开启',
@@ -299,8 +298,8 @@ include(base_path('resources/views/opwifi/common.php'));
                           {title:'VLAN', field:'_v.vlan.v'},
                           {title:'访客网络', field:'_v.guest.v', type:'check'},
                           {title:'隔离', field:'_v.isolate.v', type:'check'},
-                          {title:'最大终端数', field:'max_sta'},
-                          {title:'接入信号门限', field:'week_signal', comment:'-30 ~ -90, dbm。'},
+                          {title:'最大终端数', field:'_v.max_sta.v'},
+                          {title:'接入信号门限', field:'_v.weak_signal.v', comment:'-30 ~ -90, dbm。'},
                       ],row);
                 },
                 'click .delete': function (e, value, row, index) {

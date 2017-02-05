@@ -6,7 +6,7 @@
 				['name' => 'device_fw', 'string' => '设备固件', 'url' => URL::route('opwifi::device.firmware') ],
 				['name' => 'device_cfg', 'string' => '配置管理', 'url' => URL::route('opwifi::device.config') ],
 			] ],
-		['name' => 'webportal', 'string' => 'Web Portal', 'url' => '#', 'iconClass' => 'glyphicon glyphicon-log-in', 'sub' => [
+		['name' => 'webportal', 'string' => '网页认证', 'url' => '#', 'iconClass' => 'glyphicon glyphicon-log-in', 'sub' => [
 				['name' => 'device_cfg', 'string' => '配置管理', 'url' => URL::route('opwifi::webportal.config') ],
 				['name' => 'user_mng', 'string' => '用户管理', 'url' => URL::route('opwifi::webportal.user') ],
 				['name' => 'device_mng', 'string' => '设备管理', 'url' => URL::route('opwifi::webportal.device.management') ],

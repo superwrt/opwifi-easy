@@ -64,7 +64,11 @@ abstract class OwCRUDController extends Controller
 					$cfg['id'] = 1;
 				}
 			}
-			$this->newOwnModel()->create($cfg);
+			if (method_exists($this, 'createOwnModel')) {
+				$this->createOwnModel($cfg);
+			} else {
+				$this->newOwnModel()->create($cfg);
+			}
 		}
 		return response()->json(['success'=>true]);
 	}
@@ -82,7 +86,11 @@ abstract class OwCRUDController extends Controller
 					$cfg['id'] = 1;
 				}
 			}
-			$this->newOwnModelRoot()->create($cfg);
+			if (method_exists($this, 'createOwnModelRoot')) {
+				$this->createOwnModelRoot($cfg);
+			} else {
+				$this->newOwnModelRoot()->create($cfg);
+			}
 		}
 		return response()->json(['success'=>true]);
 	}
