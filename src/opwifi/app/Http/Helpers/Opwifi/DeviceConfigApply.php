@@ -16,26 +16,26 @@ class DeviceConfigApply
 			if (count($cfg)) {
 				$set = [
 					'radio' => [],
-					'vap' => []
+					'vif' => []
 				];
 				if (isset($cfg['_0'], $cfg['_o'])) {
-					$set['vap'] = ['_0'=>[], '_o'=>$cfg['_o']];
-					$vaps = &$set['vap']['_0'];
+					$set['vif'] = ['_0'=>[], '_o'=>$cfg['_o']];
+					$vifs = &$set['vif']['_0'];
 					$wlans = $cfg['_0'];
 				} else {
-					$vaps = &$set['vap'];
+					$vifs = &$set['vif'];
 					$wlans = $cfg;
 				}
 				foreach ($wlans as $k => $v) {
 					if (!isset($v['name']))
 						continue;
-					if (isset($v['vaps'])) {
-						foreach ($v['vaps'] as $vk => $vv) {
+					if (isset($v['vifs'])) {
+						foreach ($v['vifs'] as $vk => $vv) {
 
-							$vaps[] = array_merge($vv,
+							$vifs[] = array_merge($vv,
 									['radio' => $v['name']]);
 						}
-						unset($v['vaps']);
+						unset($v['vifs']);
 					}
 					$set['radio'][] = $v;
 				}

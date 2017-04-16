@@ -233,7 +233,7 @@ include(base_path('resources/views/opwifi/common.php'));
   var config = {{ $config['config']?$config['config']:'{}' }};
   var pdata = <?php $config['pdata']?print($config['pdata']):print('{}'); ?>;
 
-  function load_vaps($t, data) {
+  function load_vifs($t, data) {
     $t.bootstrapTable({
             columns: [[
             {
@@ -313,9 +313,9 @@ include(base_path('resources/views/opwifi/common.php'));
           });
   }
 
-  function wlan_add_vap(idx) {
+  function wlan_add_vif(idx) {
     var i;
-    var $t = $('#cf_wlan'+idx+'_vaps');
+    var $t = $('#cf_wlan'+idx+'_vifs');
     var all = $t.bootstrapTable('getData');
     var id = 0;
     for (id = 0; id < 8; id++) {
@@ -356,19 +356,19 @@ include(base_path('resources/views/opwifi/common.php'));
       if (bandwidth !== null) $('#cf_wlan'+idx+'_bw').val(bandwidth);
       if (power !== null) $('#cf_wlan'+idx+'_pw').val(power);
       var vs = [];
-      var vaps = $.opwifi.getItemField(wlan, "vaps.v");
-      if (vaps) {
-        for (var i in vaps) {
-          if (typeof(vaps[i].v) != "undefined") {
-            var vap = vaps[i].v;
-            var id = $.opwifi.getItemField(vap, "id.v");
-            if (id !== null) vs.push({'id':id, '_v':vap});
+      var vifs = $.opwifi.getItemField(wlan, "vifs.v");
+      if (vifs) {
+        for (var i in vifs) {
+          if (typeof(vifs[i].v) != "undefined") {
+            var vif = vifs[i].v;
+            var id = $.opwifi.getItemField(vif, "id.v");
+            if (id !== null) vs.push({'id':id, '_v':vif});
           }
         }
       }
-      load_vaps($('#cf_wlan'+idx+'_vaps'), vs);
+      load_vifs($('#cf_wlan'+idx+'_vifs'), vs);
     } else {
-      load_vaps($('#cf_wlan'+idx+'_vaps'), []);
+      load_vifs($('#cf_wlan'+idx+'_vifs'), []);
     }
   }
 
@@ -422,12 +422,12 @@ include(base_path('resources/views/opwifi/common.php'));
       }
       wlan.push('</select></div>');
 
-      wlan.push('<div class="form-group"><a id="cf_wlan'+idx+'_add" class="btn btn-success btn-sm" onClick="wlan_add_vap('+idx+')"><span class="glyphicon glyphicon-plus"></span> 增加SSID</a></div>');
+      wlan.push('<div class="form-group"><a id="cf_wlan'+idx+'_add" class="btn btn-success btn-sm" onClick="wlan_add_vif('+idx+')"><span class="glyphicon glyphicon-plus"></span> 增加SSID</a></div>');
 
       wlan.push('</div>');
       wlan.push('</div>');
 
-      wlan.push('<table id="cf_wlan'+idx+'_vaps" data-id-field="id"></table>');
+      wlan.push('<table id="cf_wlan'+idx+'_vifs" data-id-field="id"></table>');
       wlan.push('</div>');
 
       $('#wlan_ctx').append(wlan.join(''));
@@ -480,12 +480,12 @@ include(base_path('resources/views/opwifi/common.php'));
           channel: {v:$(p+'ch').val(),c:$(p+'ch').val()?true:false},
           bandwidth: {v:$(p+'bw').val(),c:$(p+'bw').val()?true:false},
           txpower: {v:$(p+'pw').val(),c:$(p+'pw').val()?true:false},
-          vaps: {v:[], c:true}
+          vifs: {v:[], c:true}
         };
-        var vaps = wlan.vaps.v;
-        var cvaps = $(p+'vaps').bootstrapTable('getData');
-        for (var j = 0; j < cvaps.length; j++) {
-          vaps.push({v:cvaps[j]._v, c:true});
+        var vifs = wlan.vifs.v;
+        var cvifs = $(p+'vifs').bootstrapTable('getData');
+        for (var j = 0; j < cvifs.length; j++) {
+          vifs.push({v:cvifs[j]._v, c:true});
         }
         wlans.push({v:wlan, c:$(p+'cfg').prop('checked')});
       }

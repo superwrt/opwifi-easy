@@ -99,8 +99,10 @@ return [
     */
 
     'log' => env('APP_LOG', 'daily'),
+	
+	'log_max_files' => 30,
 
-    'log-level' => 'info',
+    'log-level' => 'notice',
 
     /*
     |--------------------------------------------------------------------------
