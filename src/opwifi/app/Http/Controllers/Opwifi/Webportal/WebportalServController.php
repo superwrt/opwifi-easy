@@ -361,10 +361,9 @@ class WebportalServController extends Controller {
 			$authdev = $oldSt->authdev()->first();
 			$isAuthdev = $authdev && $authdev->device->first()['mac'] == $this->devMac;
 			if ($st['online'] && $this->wpConfig &&
-				(($this->wpConfig->roaming && $oldSt['authed']) ||
-				$isAuthdev)) {
+				    ($oldSt['authed'] && ($this->wpConfig->roaming || $isAuthdev))) {
 				/* 处理允许漫游和设备意外重启。 */
-				if (time() < $oldSt->last_deadline) {
+				if (date("Y-m-d H:i:s",time()) < $oldSt->last_deadline) {
 					$permit = true;
 				} else {
 					/* 更正authed值 */

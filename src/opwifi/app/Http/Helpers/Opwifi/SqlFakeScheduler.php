@@ -11,8 +11,8 @@ class SqlFakeScheduler
 	static public function getRules() {
 		return [
         ['name'=>'owOutDevOnline', 'comment'=>'Update Online status', 'every'=>'10 MINUTE', 'sql'=>'
-UPDATE `ow_devicemeta` SET `online` =\'0\', `updated_at` = CURRENT_TIMESTAMP WHERE `online` =\'1\' AND TIMESTAMPDIFF(MINUTE, lastshow, CURRENT_TIMESTAMP) > 20;
-UPDATE `ow_webportal_devices` SET `online` =\'0\', `updated_at` = CURRENT_TIMESTAMP WHERE `online` =\'1\' AND  TIMESTAMPDIFF(MINUTE, lastshow, CURRENT_TIMESTAMP) > 10;
+UPDATE `ow_devicemeta` SET `online` =\'0\', `updated_at` = CURRENT_TIMESTAMP WHERE `online` =\'1\' AND TIMESTAMPDIFF(MINUTE, last_show, CURRENT_TIMESTAMP) > 20;
+UPDATE `ow_webportal_devices` SET `online` =\'0\', `updated_at` = CURRENT_TIMESTAMP WHERE `online` =\'1\' AND  TIMESTAMPDIFF(MINUTE, last_show, CURRENT_TIMESTAMP) > 10;
 '],
         ['name'=>'owCleaner', 'comment'=>'Clean unneed resource', 'every'=>'1 DAY', 'start'=>'2000-01-01 02:30:00', 'sql'=>'
 DELETE FROM `ow_webportal_tokens` WHERE TIMESTAMPDIFF(DAY, updated_at, CURRENT_TIMESTAMP) > 1;
