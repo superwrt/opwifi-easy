@@ -176,8 +176,4 @@ class OwDevtags extends Model
 	    return true;
     }
 
-    public function delTag()
-    {
-
-    }
 }

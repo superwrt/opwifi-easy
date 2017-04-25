@@ -14,4 +14,9 @@ class OwStations extends Model
     {
         return $this->hasOne('App\Models\OwStationmeta', 'sta_id');
     }
+
+    public function tags()
+    {
+        return $this->belongsToMany('App\Models\OwStatags', 'ow_statag_relationships', 'sta_id', 'tag_id');
+    }
 }

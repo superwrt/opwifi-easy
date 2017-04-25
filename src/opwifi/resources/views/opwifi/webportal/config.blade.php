@@ -128,31 +128,66 @@
 
     window.operateEvents = {
         'click .edit': function (e, value, row, index) {
+
+            var tags;
+            $.ajax({
+                async: false,
+                cache: false,
+                dataType:"json",
+                contentType: "application/json; charset=utf-8",
+                type: 'GET',
+                url: '/m/station/management/all-tags',
+                success: function(d) {
+                    tags = d;
+                },
+                error: function(e) {
+                    $.opwifi.opalert($('#owcontent'), 'warning');
+                }
+            });
+            if (!tags) {
+                return;
+            }
+            var taglist = [{name:"无", value:0}];
+            for (var i in tags) {
+                taglist.push({name:tags[i].name, value:tags[i].id});
+            }
+
             $.opwifi.ajaxOpwifiEdit("{{ '/'.Request::path().'/update' }}", $table,
                 'editcfg'+row.id, '修改配置',[
                     {field:'id', type:'hidden'},
                     {title:'名称', field:'name'},
+                    {title:'模式', field:'mode', type:"select", opts: [
+                        {name: '用户登录', value: 'login'},
+                        {name: '确认点击', value: 'confirm'},
+                        {name: '直接放行', value: 'pass'},
+                        {name: '外部', value: 'partner'}
+                    ]},
+                    {title:'重定向地址', field:'redirect', comment:'以http://开头。'},
+                    {title:'外部Token', field:'access_token', comment:'仅外部模式时使用。'},
                     {title:'强制超时时间', field:'force_timeout', comment:'秒，60-2592000。'},
                     {title:'空闲超时时间', field:'idle_timeout', comment:'秒，20-172800。'},
                     {title:'最大用户数', field:'max_users', comment:'为0时不限制。'},
                     {title:'上报周期', field:'period', comment:'秒，5-172800。'},
                     {title:'IP白名单', field:'white_ip', type:"textarea", comment:'多个之间以“,”号分隔。'},
                     {title:'域名白名单', field:'white_domain', type:"textarea", comment:'多个之间以“,”号分隔。'},
-                    {title:'模式', field:'mode', type:"select", opts: [
-                        {name: '用户登录', value: 'login'},
-                        {name: '确认点击', value: 'confirm'},
-                        {name: '外部', value: 'partner'}
+                    {title:'允许漫游', field:'roaming', type:"check"},
+                    {title:'终端MAC地址过滤', field:'mac_filter_type', type:"select", opts: [
+                        {name: '无', value: 'none'},
+                        {name: '仅允许Tag中终端', value: 'allow'},
+                        {name: '不允许Tag中终端', value: 'deny'}
                     ]},
-                    {title:'重定向地址', field:'redirect', comment:'以http://开头。'},
-                    {title:'外部Token', field:'access_token', comment:'仅外部模式时使用。'},
+                    {title:'终端MAC地址Tag', field:'mac_filter_tag', type:"select", opts: taglist}
                 ],row);
             function onModeChg() {
                 var dis=($('#editcfg'+row.id+'_mode').val() == 'partner')?"block":"none";
                 $('#group_editcfg'+row.id+'_redirect').css("display", dis);
                 $('#group_editcfg'+row.id+'_access_token').css("display", dis);
+                $('#group_editcfg'+row.id+'_mac_filter_tag').css("display",
+                    ($('#editcfg'+row.id+'_mac_filter_type').val() == 'none')?"none":"block");
             }
             onModeChg();
             $('#editcfg'+row.id+'_mode').change(onModeChg);
+            $('#editcfg'+row.id+'_mac_filter_type').change(onModeChg);
         }
     };
 

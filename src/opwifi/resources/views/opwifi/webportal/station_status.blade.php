@@ -72,24 +72,24 @@
                         title: '在线状态',
                         sortable: true,
                     }, {
-                        field: 'auth',
+                        field: 'authed',
                         title: '认证状态',
                         sortable: true,
                     }, {
-                        field: 'lastonline',
+                        field: 'last_online',
                         title: '最近上线时间',
                         sortable: true,
                     }, {
-                        field: 'lastoffline',
+                        field: 'last_offline',
                         title: '最近离线时间',
                         sortable: true,
                     }, {
-                        field: 'online_time',
+                        field: 'time_used',
                         title: '上线时长',
                         sortable: true,
                     }, {
-                        field: 'online_total',
-                        title: '总上线时长',
+                        field: 'time_total',
+                        title: '历史上线时长',
                         sortable: true,
                     }, {
                         field: 'tx_rate',

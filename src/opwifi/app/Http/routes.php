@@ -63,6 +63,7 @@ Route::group(['prefix' => 's/dev', 'namespace' => 'Opwifi\Device', 'middleware' 
 Route::group(['prefix' => 's/webp', 'namespace' => 'Opwifi\Webportal'], function()
 {
     Route::post('1/ctrl', 'WebportalServController@postCtrl');
+    Route::post('1/auth', 'WebportalServController@postAuth');
 });
 
 

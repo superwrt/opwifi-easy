@@ -123,7 +123,6 @@
             }
             switch(opt.type) {
             case 'check':
-                console.log(val);
             	htmlForm.push('<label><input type="checkbox" class="input-md" name="'+
             		opt.field+'" placeholder="'+opt.title+'" id="'+id+'_'+opt.field+'" '+(val?"checked":'')+'></label>');
             	break;

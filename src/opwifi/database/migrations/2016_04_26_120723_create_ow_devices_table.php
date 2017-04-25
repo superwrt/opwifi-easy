@@ -54,8 +54,8 @@ class CreateOwDevicesTable extends Migration
             $table->foreign('dev_id')->references('id')->on('ow_devices')->onDelete('cascade');
 
             $table->boolean('online');
-            $table->timestamp('lastshow');
-            $table->string('lastip',16);
+            $table->timestamp('last_show');
+            $table->string('last_ip',16);
 
             $table->string('address',256);
             $table->string('geo_longitude',16);

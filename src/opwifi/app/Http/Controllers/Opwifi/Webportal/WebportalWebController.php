@@ -77,7 +77,7 @@ class WebportalWebController extends Controller {
 		}
 
 		/* 使用oplogin.com而不是gateway! */
-		$path = 'http://oplogin.com/api/webp/1/confirm?'.
+		$path = 'http://'.$input['gatewayip'].'/api/webp/1/confirm?'.
 				http_build_query(array_merge($input, ['token'=>$token]));
 
 		return Redirect::to($path, 302);
@@ -99,7 +99,7 @@ class WebportalWebController extends Controller {
 		if ($cfg['success_redirect']) {
 			$r['redir'] = $cfg['success_redirect'];
 		}
-		$path = 'http://oplogin.com/api/webp/1/confirm?'.http_build_query($r);
+		$path = 'http://'.$input['gatewayip'].'/api/webp/1/confirm?'.http_build_query($r);
 		return Redirect::to($path, 302);
 	}
 
@@ -110,7 +110,7 @@ class WebportalWebController extends Controller {
 				['error'=>'请求中信息不全。']));
 		}
 		$input = $request->only($this->checkArgsOut);
-		$sta = WebportalServController::userStatus($input['mac'], $input['usermac']);
+		$sta = WebportalServController::userStatus($input['usermac']);
 		if (!$sta || !$sta['auth']) {
 			return $this->getLogin($request);
 		}

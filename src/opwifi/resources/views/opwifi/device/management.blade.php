@@ -93,11 +93,11 @@
                         title: '在线状态',
                         sortable: true
                     }, {
-                        field: 'lastshow',
+                        field: 'last_show',
                         title: '最近上线时间',
                         sortable: true
                     }, {
-                        field: 'lastip',
+                        field: 'last_ip',
                         title: '最近上线地址'
                     }, {
                         field: 'fwver',

@@ -111,7 +111,7 @@ class WebportalServController extends Controller {
     	return $token;
     }
 
-    static public function userStatus($mac, $usermac) {
+    static public function userStatus($usermac) {
     	$sta = OwWebportalStationStatus::where(['mac'=>$usermac])->first();
     	if ($sta) {
 			//TODO: 先检查用户的状态，是否是设备掉线，造成的未解认证用户。
@@ -120,13 +120,28 @@ class WebportalServController extends Controller {
     	return null;
     }
 
+    private function checkUserMac($mac) {
+        if (!$this->wpConfig)
+            return true;
+        $type = $this->wpConfig->mac_filter_type;
+        $tagid = $this->wpConfig->mac_filter_tag;
+        if ($tagid && ($type == "allow" || $type == "deny")) {
+            $sta = owStations::where(['mac'=>$mac])->first();
+            if ($sta)
+                $tag = $sta->tags()->find($tagid);
+            if ((!$tag && $type == "allow") || ($tag &&  $type == "deny"))
+                return false;
+        }
+        return true;
+    }
+
     private function syncConfig(Array $old) {
         $rep = &$this->ctrlRep;
     	$cfg = self::getDevConfig($this->devMac);
     	if ($cfg) {
             $jcfg = array(
-                "white_ip" => explode(',',$cfg->white_ip),
-                "white_domain" => explode(',',$cfg->white_domain),
+                "white_ip" => strlen($cfg->white_ip)?explode(',',$cfg->white_ip):[],
+                "white_domain" => strlen($cfg->white_domain)?explode(',',$cfg->white_domain):[],
                 "idle_timeout" => $cfg->idle_timeout,
                 "force_timeout" => $cfg->force_timeout,
                 "period" => $cfg->period,
@@ -265,7 +280,15 @@ class WebportalServController extends Controller {
 			}
 		}
 	}
-    
+
+    private function stationBlock($mac) {
+        $this->ctrlRep['cmd']['users'][] = [
+                "mac" => $mac,
+                'permit' => false,
+                'block' => true, /* Don't allowed any type traffic! */
+            ];
+    }
+
     private function stationUnpermit($mac) {
         $this->ctrlRep['cmd']['users'][] = [
                 "mac" => $mac,
@@ -301,6 +324,8 @@ class WebportalServController extends Controller {
     		return;
     	}
 
+        $usermac = $info['mac'];
+
     	switch ($ev['event']) {
     	case 'user offline':
 		/* 更新： mac,indev,bssid,ssid,authed,online,trx_used */
@@ -330,32 +355,32 @@ class WebportalServController extends Controller {
 			return;
 		}
 
-		$oldSt = OwWebportalStationStatus::where('mac', $info['mac'])->first();
+		$permit = false;
+		$oldSt = OwWebportalStationStatus::where('mac', $usermac)->first();
 		if ($oldSt) {
-            $authdev = $oldSt->authdev()->first();
-            $isAuthdev = $authdev && $authdev->device->first()['mac'] == $this->devMac;
-            if ($st['online'] && $this->wpConfig &&
-                    (($this->wpConfig->roaming && $oldSt['authed']) ||
-                     $isAuthdev)) {
-                /* 处理允许漫游和设备意外重启。 */
-                if (time() < $oldSt->last_deadline) {
-                    $this->stationPermit($usermac, $oldSt);
-                } else {
-                    /* 更正authed值 */
-                    $st['authed'] = false;
-                    $st['authdev_id'] = null;
-                }
-            }
-
+			$authdev = $oldSt->authdev()->first();
+			$isAuthdev = $authdev && $authdev->device->first()['mac'] == $this->devMac;
+			if ($st['online'] && $this->wpConfig &&
+				(($this->wpConfig->roaming && $oldSt['authed']) ||
+				$isAuthdev)) {
+				/* 处理允许漫游和设备意外重启。 */
+				if (time() < $oldSt->last_deadline) {
+					$permit = true;
+				} else {
+					/* 更正authed值 */
+					$st['authed'] = false;
+					$st['authdev_id'] = null;
+				}
+			}
 			if ($calcSt && $isAuthdev) {
 				//兼容掉线及错误情况。
 				$trx_used = ($st['trx_used'] > $oldSt->trx_used) ? $st['trx_used'] : $oldSt->trx_used;
 				$st['trx_total'] = $oldSt->trx_total + $trx_used;
-                $st['trx_used'] = 0;
+				$st['trx_used'] = 0;
 
 				$time_used = ($st['time_used'] > $oldSt->time_used) ? $st['time_used'] : $oldSt->time_used;
 				$st['time_total'] = $oldSt->time_total + $time_used;
-                $st['time_used'] = 0;
+				$st['time_used'] = 0;
 			}
 			$oldSt->update($st);//XXX: Sta changed???
 		} else {
@@ -364,9 +389,20 @@ class WebportalServController extends Controller {
 				$st['online_total'] = $st['online_time'];
 			}
 			$oldSt = OwWebportalStationStatus::create(array_merge(
-				['mac'=>$info['mac'], 'ondev'=>$this->devMac], $st));
+				['mac'=>$usermac, 'ondev'=>$this->devMac], $st));
 		}
-		if ($calcSt && $isAuthdev) {
+		if ($st['online']) {
+			if (!$this->checkUserMac($usermac)) {
+				$permit = false;
+				$this->stationBlock($usermac);
+			} else if ($this->wpConfig && $this->wpConfig->mode == "pass") {
+				$this->stationAuth($usermac, null);
+				$permit = true;
+			}
+		}
+		if ($permit) {
+			$this->stationPermit($usermac, $oldSt);
+		} else if ($calcSt && $isAuthdev) {
 			$this->stationDeauth($usermac, true);
 		}
 	}
@@ -414,18 +450,23 @@ class WebportalServController extends Controller {
     		$args = $cf['args'];
     		$redirect = isset($args['redir'])?$args['redir']:null;
 
-    		if (isset($args['mac'], $args['username']) &&
+    		if (isset($args['mac'], $args['usermac']) &&
     			$usermac == $args['usermac']) {
 
-    			if (isset($args['token']) && is_string($args['token'])) {
+    			if (isset($args['token']) && is_string($args['token']) &&
+                        $this->checkUserMac($args['usermac'])) {
     				$tk = OwWebportalTokens::where('token', $args['token'])->first();
-    				if ($tk) {
-                        if ($tk['redirect'])
-    					   $redirect = $tk['redirect'];
-                        $permit = true;
-                        /* Check trx_limit, when login */
-    					$this->stationPermit($usermac, $tk);
-                        $this->stationAuth($usermac, $tk->user()->first());
+    				if ($tk && !$tk->used) {
+                        if ($usermac == $tk->usermac && $this->devMac == $tk->mac &&
+                                $tk->created_at > date("Y-m-d H:i:s", time() - 120)) {
+                            if ($tk['redirect'])
+        					   $redirect = $tk['redirect'];
+                            $permit = true;
+                            /* Check trx_limit, when login */
+        					$this->stationPermit($usermac, $tk);
+                            $this->stationAuth($usermac, $tk->user()->first());
+                        }
+                        $tk->update(['used'=>true]);
     				}
     			} else if (isset($args['logout'])) {
     				$rep['cmd']['users'][] = ["mac" => $usermac,"permit" => false];
@@ -452,8 +493,9 @@ class WebportalServController extends Controller {
      * @param  Request $request
      * @return
      */
-    private function getDevice($mac) {
-    	$online = ['online'=>true, 'lastshow'=>date("Y-m-d H:i:s",time())];
+    private function getDevice($mac, $update) {
+        if ($update)
+    	   $online = ['online'=>true, 'last_show'=>date("Y-m-d H:i:s",time())];
 
     	$this->devMac = $mac;
     	$dev = OwDevices::with('webportal')->where('mac', $mac)->first();
@@ -462,11 +504,15 @@ class WebportalServController extends Controller {
     	}
 
     	$wpdev = $dev->webportal()->first();
-    	if (!$wpdev) {
-    		$wpdev = $dev->webportal()->create($online);
-    	} else {
-    		$wpdev->update($online);
-    	}
+        if ($update) {
+        	if (!$wpdev) {
+        		$wpdev = $dev->webportal()->create($online);
+        	} else {
+        		$wpdev->update($online);
+        	}
+        } else if (!$wpdev) {
+            $wpdev = $dev->webportal()->create();
+        }
     	$this->wpDev = $wpdev;
         $this->wpConfig = $wpdev->config()->first();
     }
@@ -488,7 +534,7 @@ class WebportalServController extends Controller {
     	if (!isset($req['mac']))
     		return;
 
-    	$this->getDevice($req['mac']);
+    	$this->getDevice($req['mac'], true);
 
     	$this->ctrlRep = ["cmd" => ["users" => [] ] ];
 
@@ -531,15 +577,51 @@ class WebportalServController extends Controller {
     		return;
 
     	$req = $request->json()->all();
-    	if (!isset($req['mac'], $req['usermac'], $req['redir'], $req['gatewayip'], $req['access_token'])) {
-    		return;
+        if (!isset($req['mac'], $req['usermac'], $req['access_token'])) {
+            Log::debug('Webportal Auth: Invalid input!');
+            return response()->json(['status'=>'failed', 'error'=>'Invalid input.', 'errtag'=>'invalid']);
+        }
+        $req['mac'] = strtolower($req['mac']);
+        $req['usermac'] = strtolower($req['usermac']);
+
+        $this->getDevice($req['mac'], false);
+        if (!$this->wpConfig) {
+            Log::info('Webportal Auth: Not managed device '.$req['mac']);
+            return response()->json(['status'=>'failed', 'error'=>'Not managed device.', 'errtag'=>'notmngdev']);
+        }
+
+        if (isset($req['op'])) {
+            if ($req['op'] == 'status') {
+                $sta = self::userStatus($req['usermac']);
+                if ($sta) {
+                    $rst = array_intersect_key($sta,
+                        array_flip(array('mac','ondev','online','authed','ssid','bssid',
+                            'time_limit','time_used','time_total','trx_limit','trx_used','trx_total')));
+                } else {
+                    $rst = ['mac'=>$req['usermac'], 'online'=>false, 'authed'=>false];
+                }
+                return response()->json(['status'=>'success', 'result'=>$rst]);
+            } else if ($req['op'] == 'deauth') {
+                $this->stationDeauth($req['usermac']);
+                return response()->json(['status'=>'success']);
+            }
+        }
+    	if (!isset($req['redir'], $req['gatewayip'])) {
+            Log::debug('Webportal Auth: Invalid input!');
+    		return response()->json(['status'=>'failed', 'error'=>'Invalid input.', 'errtag'=>'invalid']);
     	}
-    	$cfg = self::getDevConfig($req['mac']);
-    	if (!$cfg || $cfg['access_token'] != $req['access_token']) {
-    		return response()->json(['success'=>false]);
-    	}
-    	$token = self::auth($req['mac'], $req['usermac'], null, $req['redir']);
-    	return response()->json(['success'=>true, 'token'=>$token, 'mac'=>$req['mac'], 'usermac'=>$req['usermac']]);
+
+        if ($this->wpConfig['access_token'] != $req['access_token']) {
+            Log::info('Webportal Auth: Invalid access token '.$req['access_token']);
+    		return response()->json(['status'=>'failed', 'error'=>'Invalid access token.', 'errtag'=>'denytoken']);
+    	} else if (!$this->checkUserMac($req['usermac'])) {
+            Log::debug('Webportal Auth: Blocked user mac '.$req['usermac']);
+            return response()->json(['status'=>'failed', 'error'=>'Blocked user mac.', 'errtag'=>'blockusermac']);
+        }
+
+    	$token = self::authUser($req['mac'], $req['usermac'], $req['redir'], null);
+        Log::debug('Webportal Auth: Authed usermac '.$req['usermac'].' in '.$req['mac']);
+    	return response()->json(['status'=>'success', 'result'=>['token'=>$token, 'mac'=>$req['mac'], 'usermac'=>$req['usermac']]]);
     }
 
 

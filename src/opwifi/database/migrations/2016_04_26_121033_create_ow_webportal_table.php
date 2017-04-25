@@ -19,7 +19,7 @@ class CreateOwWebportalTable extends Migration
             $table->text('comment');
 
             $table->boolean('roaming');
-            $table->string('mode', 32);
+            $table->string('mode', 16);
             $table->string('access_token', 128);
             $table->string('success_redirect',256);
 
@@ -30,6 +30,9 @@ class CreateOwWebportalTable extends Migration
             $table->text('white_domain');
             $table->unsignedInteger('period');
             $table->unsignedInteger('max_users');
+
+            $table->string('mac_filter_type',16)->default('none');
+            $table->unsignedInteger('mac_filter_tag');
             
             $table->timestamps();
         });
@@ -43,6 +46,7 @@ class CreateOwWebportalTable extends Migration
             $table->string('redirect',1024);
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('ow_webportal_users')->onDelete('set null');
+            $table->boolean('used')->default(false);
 
             $table->string('username', 64);
             $table->unsignedInteger('tx_rate');
@@ -62,7 +66,7 @@ class CreateOwWebportalTable extends Migration
             $table->foreign('config_id')->references('id')->on('ow_webportal_configs')->onDelete('set null');
 
             $table->boolean('online');
-            $table->timestamp('lastshow');
+            $table->timestamp('last_show');
             $table->unsignedInteger('users');
 
             $table->timestamps();

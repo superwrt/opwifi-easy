@@ -73,7 +73,7 @@
                         title: '在线状态',
                         sortable: true,
                     }, {
-                        field: 'lastshow',
+                        field: 'last_show',
                         title: '最近上报时间',
                         sortable: true,
                     }, {

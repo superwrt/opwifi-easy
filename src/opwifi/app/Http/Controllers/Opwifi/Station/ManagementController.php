@@ -78,6 +78,11 @@ class ManagementController extends OwCRUDController {
 		return response()->json($tags);
 	}
 
+	public function getAllTags(Request $request) {
+		$r = OwStatags::all();
+		return response()->json($r);
+	}
+
 	public function postRename(Request $request) {
 		$id = $request->get('id');
 		if (!$id) {

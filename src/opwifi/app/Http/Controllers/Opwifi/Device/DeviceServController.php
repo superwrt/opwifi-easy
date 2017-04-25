@@ -138,8 +138,8 @@ class DeviceServController extends Controller {
 			['hardware.mtd.firmware.size', 'flashfwsize']]);
 
 		$meta = array_merge($meta, [
-			'lastshow' => date("Y-m-d H:i:s",time()),
-			'lastip' => $ip,
+			'last_show' => date("Y-m-d H:i:s",time()),
+			'last_ip' => $ip,
 			'online' => true
 		]);
 
