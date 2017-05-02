@@ -9,6 +9,7 @@ use Illuminate\Http\Response;
 use Input, Log;
 
 use App\Models\OwDevices;
+use App\Models\OwStations;
 use App\Models\OwWebportalConfigs;
 use App\Models\OwWebportalStationStatus;
 use App\Models\OwWebportalTokens;
@@ -126,6 +127,7 @@ class WebportalServController extends Controller {
         $type = $this->wpConfig->mac_filter_type;
         $tagid = $this->wpConfig->mac_filter_tag;
         if ($tagid && ($type == "allow" || $type == "deny")) {
+            $tag = null;
             $sta = owStations::where(['mac'=>$mac])->first();
             if ($sta)
                 $tag = $sta->tags()->find($tagid);
@@ -203,6 +205,7 @@ class WebportalServController extends Controller {
 
         $st = ['authed' => true, 'online' => true,
             'ondev' => $this->devMac, 'authdev_id' => $this->wpDev->id,
+            'config_id' => $this->wpConfig->id,
             'last_auth' => date("Y-m-d H:i:s",time()),
             'last_deadline' => date("Y-m-d H:i:s", time() + $tmout),
             'user_id' => $user ? $user->id : null,
@@ -361,7 +364,8 @@ class WebportalServController extends Controller {
 			$authdev = $oldSt->authdev()->first();
 			$isAuthdev = $authdev && $authdev->device->first()['mac'] == $this->devMac;
 			if ($st['online'] && $this->wpConfig &&
-				    ($oldSt['authed'] && ($this->wpConfig->roaming || $isAuthdev))) {
+                            ($oldSt['authed'] && ($isAuthdev ||
+                            ($this->wpConfig->roaming && $oldSt['config_id'] == $this->wpConfig->id)))) {
 				/* 处理允许漫游和设备意外重启。 */
 				if (date("Y-m-d H:i:s",time()) < $oldSt->last_deadline) {
 					$permit = true;
@@ -471,7 +475,21 @@ class WebportalServController extends Controller {
     				$rep['cmd']['users'][] = ["mac" => $usermac,"permit" => false];
 					//TODO: 虽然在event中处理了logout，这里还是要处理一下，以防止之后的通信异常。
 					$this->stationDeauth($usermac);
-    			}
+    			} else if (isset($args['check'])) {
+                    $st = OwWebportalStationStatus::where('mac', $usermac)->first();
+                    if ($st) {/* 漫游设备可能没上报Event，或弹出速度快于应用速度，在这里处理一下。 */
+                        if ($st['authed']) {
+                            if($st['last_deadline'] > date("Y-m-d H:i:s", time())) {
+                                if ($this->wpConfig->roaming && $oldSt['config_id'] == $this->wpConfig->id) {
+                                    $this->stationPermit($usermac, $st);
+                                    $permit = true;
+                                }
+                            } else {
+                                $st->update(['authed'=>false]);
+                            }
+                        }
+                    }
+                }
     		}
     	}
 
@@ -574,10 +592,12 @@ class WebportalServController extends Controller {
     public function postAuth(Request $request) {
     	if (!$request->isJson())
     		return;
+        $req = $request->json()->all();
 
-    	$req = $request->json()->all();
+        Log::debug('Webportal Auth: Request:'.var_export($req, true));
+
         if (!isset($req['mac'], $req['usermac'], $req['access_token'])) {
-            Log::debug('Webportal Auth: Invalid input!');
+            Log::debug('Webportal Auth: Invalid args!');
             return response()->json(['status'=>'failed', 'error'=>'Invalid input.', 'errtag'=>'invalid']);
         }
         $req['mac'] = strtolower($req['mac']);
@@ -593,12 +613,14 @@ class WebportalServController extends Controller {
             if ($req['op'] == 'status') {
                 $sta = self::userStatus($req['usermac']);
                 if ($sta) {
-                    $rst = array_intersect_key($sta,
-                        array_flip(array('mac','ondev','online','authed','ssid','bssid',
+                    $rst = array_intersect_key($sta->toArray(),
+                        array_flip(array('mac','config_id','ondev','online','authed','ssid','bssid',
                             'time_limit','time_used','time_total','trx_limit','trx_used','trx_total')));
                 } else {
                     $rst = ['mac'=>$req['usermac'], 'online'=>false, 'authed'=>false];
                 }
+                $rst['block'] = !$this->checkUserMac($req['usermac']);
+                $rst['config'] = ['roaming'=>$this->wpConfig->roaming, 'id'=>$this->wpConfig->id];
                 return response()->json(['status'=>'success', 'result'=>$rst]);
             } else if ($req['op'] == 'deauth') {
                 $this->stationDeauth($req['usermac']);

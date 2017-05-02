@@ -79,6 +79,7 @@ class CreateOwWebportalTable extends Migration
             $table->string('ondev', 20)->index();
             $table->unsignedBigInteger('authdev_id')->nullable();
             $table->foreign('authdev_id')->references('id')->on('ow_webportal_devices')->onDelete('set null');
+            $table->unsignedInteger('config_id');
 
             $table->boolean('online');
             $table->boolean('authed');

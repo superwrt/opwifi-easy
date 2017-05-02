@@ -19,4 +19,9 @@ class OwStations extends Model
     {
         return $this->belongsToMany('App\Models\OwStatags', 'ow_statag_relationships', 'sta_id', 'tag_id');
     }
+
+    public function setMacAttribute($value)
+    {
+        $this->attributes['mac'] = strtolower($value);
+    }
 }

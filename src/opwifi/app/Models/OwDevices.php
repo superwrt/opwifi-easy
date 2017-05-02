@@ -24,4 +24,9 @@ class OwDevices extends Model
     {
     	return $this->hasOne('App\Models\OwWebportalDevices', 'dev_id');
     }
+
+    public function setMacAttribute($value)
+    {
+        $this->attributes['mac'] = strtolower($value);
+    }
 }
