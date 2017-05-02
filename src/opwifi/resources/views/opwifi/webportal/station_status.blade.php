@@ -11,6 +11,19 @@
 <div>
 <h2 class="page-header">终端状态</h2>
 <div class="toolbar form-inline">
+    <div class="btn-group">
+        <button id="sta_auth" class="btn btn-success">
+            <i class="glyphicon glyphicon-log-in"></i> 认证
+        </button>
+        <button id="sta_kick" class="btn btn-warning">
+            <i class="glyphicon glyphicon-log-out"></i> 解认证
+        </button>
+    </div>
+    <div class="btn-group">
+        <button id="sta_remove" class="btn btn-danger">
+            <i class="glyphicon glyphicon-trash"></i> 删除
+        </button>
+    </div>
 </div>
 <table id="stastable"
 			data-show-columns="true"
@@ -71,10 +84,16 @@
                         field: 'online',
                         title: '在线状态',
                         sortable: true,
+                        formatter: function (value, row, index) {
+                            return value==true?'✔':'';
+                        }
                     }, {
                         field: 'authed',
                         title: '认证状态',
                         sortable: true,
+                        formatter: function (value, row, index) {
+                            return value==true?'✔':'';
+                        }
                     }, {
                         field: 'last_online',
                         title: '最近上线时间',
@@ -151,6 +170,9 @@
 
     $().ready(function(){
         load_stations();
+        $('#sta_remove').ajaxOpwifiOperation("{{ '/'.Request::path().'/delete' }}", $table);
+        $('#sta_auth').ajaxOpwifiOperation("{{ '/'.Request::path().'/auth' }}", $table);
+        $('#sta_kick').ajaxOpwifiOperation("{{ '/'.Request::path().'/kick' }}", $table);
     });
 
     </script>

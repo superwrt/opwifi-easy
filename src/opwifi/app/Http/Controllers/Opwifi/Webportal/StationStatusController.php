@@ -26,4 +26,24 @@ class StationStatusController extends OwCRUDController {
 		return view("opwifi.webportal.station_status", $this->viewData);
 	}
 
+    private function setAuth($request, $auth) {
+        if (!$request->isJson()) {
+            return ;
+        }
+        $cfgs = $request->json()->all();
+        foreach ($cfgs as $cfg) {
+            if (!$cfg['id']) continue;
+            $this->newOwnModel()->where('id', $cfg['id'])->update(['authed'=>$auth]);
+        }
+        return response()->json(['success'=>true]);
+    }
+
+    public function postKick(Request $request) {
+        return $this->setAuth($request, false);
+    }
+
+    public function postAuth(Request $request) {
+        return $this->setAuth($request, true);
+    }
+
 }

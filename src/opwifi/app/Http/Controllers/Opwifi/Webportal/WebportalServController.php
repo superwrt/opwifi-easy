@@ -254,7 +254,7 @@ class WebportalServController extends Controller {
 				$ust = $s['status'];
 				$st = array_merge($st,
 					self::arrayConvert($ust, [
-						['authed', 'auth'], ['online','time_used'],
+						['online','time_used'],
 						['trx_used']])
 					);
 				if (!isset($st['trx_used']) && isset($ust['tx_used'], $ust['rx_used'])) {
@@ -272,6 +272,8 @@ class WebportalServController extends Controller {
                         /* Roaming, and change auth to new device */
                         $st['authdev_id'] = $this->wpDev->id;
                     }
+                } else { /* Not authed device, maybe admin deauth it! */
+                    $this->stationUnpermit($s['mac']);
                 }
                 if ($oldSt->ondev != $this->devMac) {
                     $st['ondev'] = $this->devMac;
@@ -511,8 +513,11 @@ class WebportalServController extends Controller {
      * @return
      */
     private function getDevice($mac, $update) {
-        if ($update)
+        if ($update) {
     	   $online = ['online'=>true, 'last_show'=>date("Y-m-d H:i:s",time())];
+           if (is_array($update))
+                $online = array_merge($online, $update);
+        }
 
     	$this->devMac = $mac;
     	$dev = OwDevices::with('webportal')->where('mac', $mac)->first();
@@ -551,7 +556,13 @@ class WebportalServController extends Controller {
     	if (!isset($req['mac']))
     		return;
 
-    	$this->getDevice($req['mac'], true);
+        $update = true;
+        if (isset($req['status']) && is_array($req['status']) &&
+                isset($req['status']['users']) && is_array($req['status']['users'])) {
+            $update = ['users'=>count($req['status']['users'])];
+        }
+
+    	$this->getDevice($req['mac'], $update);
 
     	$this->ctrlRep = ["cmd" => ["users" => [] ] ];
 

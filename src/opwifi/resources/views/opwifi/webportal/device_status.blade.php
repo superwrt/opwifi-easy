@@ -72,6 +72,9 @@
                         field: 'online',
                         title: '在线状态',
                         sortable: true,
+                        formatter: function (value, row, index) {
+                            return value==true?'✔':'';
+                        }
                     }, {
                         field: 'last_show',
                         title: '最近上报时间',
