@@ -19,7 +19,6 @@ class CreateOwDevicesTable extends Migration
             $table->string('uid',40);
             $table->boolean('shared');//Devices have same mac address!
             $table->string('name',128);
-
             $table->timestamps();
         });
 
@@ -32,6 +31,9 @@ class CreateOwDevicesTable extends Migration
             $table->text('config');
             $table->string('md5',16);
 
+            $table->unsignedInteger('mnger_id')->nullable();
+            $table->foreign('mnger_id')->references('id')->on('ow_users')->onDelete('set null');
+
             $table->timestamps();
         });
         Schema::create('ow_dev_firmwares', function (Blueprint $table) {
@@ -43,6 +45,9 @@ class CreateOwDevicesTable extends Migration
             $table->string('org_filename', 64);
             $table->string('url', 256);
             $table->char('sha1', 40);
+
+            $table->unsignedInteger('mnger_id')->nullable();
+            $table->foreign('mnger_id')->references('id')->on('ow_users')->onDelete('set null');
 
             $table->timestamps();
         });
@@ -81,6 +86,9 @@ class CreateOwDevicesTable extends Migration
             $table->unsignedInteger('op_upgrade_trys');
             $table->foreign('op_upgrade_id')->references('id')->on('ow_dev_firmwares')->onDelete('set null');
 
+            $table->unsignedInteger('mnger_id')->nullable();
+            $table->foreign('mnger_id')->references('id')->on('ow_users')->onDelete('set null');
+
             $table->timestamps();
         });
     }
@@ -92,9 +100,9 @@ class CreateOwDevicesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('ow_devicemeta');
-        Schema::drop('ow_dev_firmwares');
-        Schema::drop('ow_dev_configs');
-        Schema::drop('ow_devices');
+        Schema::dropIfExists('ow_devicemeta');
+        Schema::dropIfExists('ow_dev_firmwares');
+        Schema::dropIfExists('ow_dev_configs');
+        Schema::dropIfExists('ow_devices');
     }
 }

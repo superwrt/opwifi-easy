@@ -71,6 +71,10 @@
                     }, {
                         field: 'email',
                         title: 'E-mail',
+                        sortable: true,
+                    }, {
+                        field: 'right',
+                        title: '权限',
                         sortable: true
                     }, {
                         field: 'operate',
@@ -121,7 +125,11 @@
             'newcfg', '添加配置',[
                 {title:'用户名', field:'username'},
                 {title:'密码', field:'password'},
-                {title:'E-mail', field:'email'}
+                {title:'E-mail', field:'email'},
+                {title:'权限', field:'right', type:"select", opts: [
+                    {name: '管理员', value: 'admin'},
+                    {name: '用户', value: 'user'}
+                ]}
             ],[]);
         $('#user_remove').ajaxOpwifiOperation("{{ '/'.Request::path().'/delete' }}", $table);
     });

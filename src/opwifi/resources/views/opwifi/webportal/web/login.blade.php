@@ -48,7 +48,7 @@
         </fieldset>
     </form>
   </div>
-  <div id="footer">Powered by <a href="http://superwrt.com/?s=owebp">SuperWRT</a></div>
+  <div id="footer">Powered by <a href="http://opwifi.com/?s=owebp">OpWiFi</a></div>
   <script src="/res/js/jquery-1.12.3.min.js"></script>
   <script type="text/javascript">
   </script>

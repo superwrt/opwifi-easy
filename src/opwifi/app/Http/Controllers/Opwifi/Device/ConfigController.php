@@ -20,6 +20,7 @@ class ConfigController extends OwCRUDController {
     {
     }
 
+    protected $limitUserId = 'mnger_id';
     protected $indexOwnModel = 'name';
     protected function newOwnModel() {
     	return new OwDevConfigs();
@@ -39,13 +40,4 @@ class ConfigController extends OwCRUDController {
         $cfg->update($request->all());
         return redirect()->route('opwifi::device.config');
     }
-
-    // public function getTest(Request $request, $id) {
-    //     $cfg = OwDevConfigs::where("id", $id)->first();
-    //     $pdata = json_decode($cfg->pdata, true);
-    //     $config = $pdata['config'];
-    //     $apply = new DeviceConfigApply();
-    //     $setting = $apply->getSetting('/', $config);
-    //     return response()->json($setting);
-    // }
 }

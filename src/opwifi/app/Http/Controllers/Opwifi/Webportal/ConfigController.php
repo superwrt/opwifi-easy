@@ -18,6 +18,7 @@ class ConfigController extends OwCRUDController {
     {
     }
 
+    protected $limitUserId = 'mnger_id';
     protected $hasOwnModelDefault = true;
     protected $indexOwnModel = 'name';
     protected function newOwnModel() {

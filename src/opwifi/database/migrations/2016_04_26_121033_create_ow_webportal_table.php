@@ -31,8 +31,11 @@ class CreateOwWebportalTable extends Migration
             $table->unsignedInteger('period');
             $table->unsignedInteger('max_users');
 
-            $table->string('mac_filter_type',16)->default('none');
+            $table->string('mac_filter_type', 16)->default('none');
             $table->unsignedInteger('mac_filter_tag');
+
+            $table->unsignedInteger('mnger_id')->nullable();
+            $table->foreign('mnger_id')->references('id')->on('ow_users')->onDelete('set null');
             
             $table->timestamps();
         });
@@ -68,6 +71,9 @@ class CreateOwWebportalTable extends Migration
             $table->boolean('online');
             $table->timestamp('last_show');
             $table->unsignedInteger('users');
+
+            $table->unsignedInteger('mnger_id')->nullable();
+            $table->foreign('mnger_id')->references('id')->on('ow_users')->onDelete('set null');
 
             $table->timestamps();
         });
@@ -108,6 +114,8 @@ class CreateOwWebportalTable extends Migration
             $table->unsignedInteger('time_total');
             $table->unsignedInteger('time_history');
 
+            $table->unsignedInteger('mnger_id')->nullable();//Too many data, don't use foreign!
+
             $table->timestamps();
         });
     }
@@ -119,9 +127,9 @@ class CreateOwWebportalTable extends Migration
      */
     public function down()
     {
-        Schema::drop('ow_webportal_devices');
-        Schema::drop('ow_webportal_station_status');
-        Schema::drop('ow_webportal_tokens');
-        Schema::drop('ow_webportal_configs');
+        Schema::dropIfExists('ow_webportal_station_status');
+        Schema::dropIfExists('ow_webportal_devices');
+        Schema::dropIfExists('ow_webportal_tokens');
+        Schema::dropIfExists('ow_webportal_configs');
     }
 }

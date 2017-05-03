@@ -18,6 +18,7 @@ class StationStatusController extends OwCRUDController {
 
     }
 
+    protected $limitUserId = 'mnger_id';
     protected function newOwnModel() {
     	return new OwWebportalStationStatus();
     }

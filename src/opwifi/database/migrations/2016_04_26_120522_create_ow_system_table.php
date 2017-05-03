@@ -29,6 +29,6 @@ class CreateOwSystemTable extends Migration
      */
     public function down()
     {
-        Schema::drop('ow_system');
+        Schema::dropIfExists('ow_system');
     }
 }

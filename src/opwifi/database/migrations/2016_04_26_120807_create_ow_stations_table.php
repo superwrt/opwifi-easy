@@ -19,6 +19,9 @@ class CreateOwStationsTable extends Migration
             $table->boolean('shared');//Devices have same mac address!
             $table->string('name',128);
 
+            $table->unsignedInteger('mnger_id')->nullable();
+            $table->foreign('mnger_id')->references('id')->on('ow_users')->onDelete('set null');
+
             $table->timestamps();
         });
         Schema::create('ow_stationmeta', function (Blueprint $table) {
@@ -47,7 +50,7 @@ class CreateOwStationsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('ow_stationmeta');
-        Schema::drop('ow_stations');
+        Schema::dropIfExists('ow_stationmeta');
+        Schema::dropIfExists('ow_stations');
     }
 }

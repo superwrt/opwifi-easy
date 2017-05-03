@@ -18,6 +18,10 @@ class CreateOwStatagsTable extends Migration
             $table->string('name',128)->unique()->index();
             $table->string('comment',128);
             $table->unsignedInteger('parent_id');
+
+            $table->unsignedInteger('mnger_id')->nullable();
+            $table->foreign('mnger_id')->references('id')->on('ow_users')->onDelete('set null');
+
             $table->timestamps();
         });
         Schema::create('ow_statags', function (Blueprint $table) {
@@ -26,6 +30,10 @@ class CreateOwStatagsTable extends Migration
             $table->string('name',128)->unique()->index();
             $table->string('comment',128);
             $table->unsignedInteger('group_id');
+
+            $table->unsignedInteger('mnger_id')->nullable();
+            $table->foreign('mnger_id')->references('id')->on('ow_users')->onDelete('set null');
+
             $table->timestamps();
         });
         Schema::create('ow_statag_relationships', function (Blueprint $table) {
@@ -45,8 +53,8 @@ class CreateOwStatagsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('ow_statag_relationships');
-        Schema::drop('ow_statags');
-        Schema::drop('ow_stagroups');
+        Schema::dropIfExists('ow_statag_relationships');
+        Schema::dropIfExists('ow_statags');
+        Schema::dropIfExists('ow_stagroups');
     }
 }

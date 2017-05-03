@@ -37,6 +37,9 @@ class CreateOwWebportalUsersTable extends Migration
             $table->unsignedBigInteger('trx_used');
             $table->unsignedInteger('time_used');
 
+            $table->unsignedInteger('mnger_id')->nullable();
+            $table->foreign('mnger_id')->references('id')->on('ow_users')->onDelete('set null');
+
             $table->timestamps();
         });
     }
@@ -48,6 +51,6 @@ class CreateOwWebportalUsersTable extends Migration
      */
     public function down()
     {
-        Schema::drop('ow_webportal_users');
+        Schema::dropIfExists('ow_webportal_users');
     }
 }

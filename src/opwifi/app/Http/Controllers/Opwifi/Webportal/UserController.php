@@ -19,6 +19,7 @@ class UserController extends OwCRUDController {
 
     }
 
+    protected $limitUserId = 'mnger_id';
     protected $indexOwnModel = 'username';
     protected function newOwnModel() {
     	return new OwWebportalUsers();

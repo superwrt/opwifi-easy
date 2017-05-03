@@ -18,6 +18,10 @@ class CreateOwDevtagsTable extends Migration
             $table->string('name',128)->unique()->index();
             $table->string('comment',128);
             $table->unsignedInteger('parent_id')->nullable();
+
+            $table->unsignedInteger('mnger_id')->nullable();
+            $table->foreign('mnger_id')->references('id')->on('ow_users')->onDelete('set null');
+
             $table->timestamps();
         });
         Schema::create('ow_devtags', function (Blueprint $table) {
@@ -26,6 +30,10 @@ class CreateOwDevtagsTable extends Migration
             $table->string('name',128)->unique()->index();
             $table->string('comment',128);
             $table->unsignedInteger('group_id');
+
+            $table->unsignedInteger('mnger_id')->nullable();
+            $table->foreign('mnger_id')->references('id')->on('ow_users')->onDelete('set null');
+
             $table->timestamps();
         });
         Schema::create('ow_devtag_relationships', function (Blueprint $table) {
@@ -46,8 +54,8 @@ class CreateOwDevtagsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('ow_devtag_relationships');
-        Schema::drop('ow_devtags');
-        Schema::drop('ow_devgroups');
+        Schema::dropIfExists('ow_devtag_relationships');
+        Schema::dropIfExists('ow_devtags');
+        Schema::dropIfExists('ow_devgroups');
     }
 }

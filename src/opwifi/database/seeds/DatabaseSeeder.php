@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
                 [
                     'username' => 'admin',
                     'password' => Hash::make('admin'),
+                    'right' => 'admin',
                     'email'  => 'your@email.com',
                     'timezone' => 'Asia/Shanghai'
                 ]
@@ -34,6 +35,14 @@ class DatabaseSeeder extends Seeder
                 [
                     'name' => '_version_raw',
                     'value' => config('opwifi.version_raw')
+                ]
+            ]);
+
+        DB::table('ow_webportal_configs')->insert(
+            [
+                [
+                    'name' => 'Default Setting',
+                    'mode' => 'login'
                 ]
             ]);
 

@@ -12,8 +12,16 @@
 <h2 class="page-header">设备管理</h2>
 <div class="toolbar form-inline">
     <div class="btn-group">
+        <button id="dev_add" class="btn btn-success">
+            <i class="glyphicon glyphicon-plus"></i> 添加
+        </button>
+    </div>
+    <div class="btn-group">
         <button id="dev_config" class="btn btn-default">
             <i class="glyphicon glyphicon-list-alt"></i> 配置绑定
+        </button>
+        <button id="dev_user" class="btn btn-default">
+            <i class="glyphicon glyphicon-user"></i> 用户
         </button>
     </div>
 </div>
@@ -77,7 +85,7 @@
                         title: '绑定配置',
                         sortable: true,
                     }, {
-                        field: 'lastshow',
+                        field: 'last_show',
                         title: '最近上线时间',
                         sortable: true,
                     }, {
@@ -128,9 +136,16 @@
 
     $().ready(function(){
         load_devices();
+        $('#dev_add').ajaxOpwifiAdd("{{ '/'.Request::path().'/add-root' }}", $table,
+            'newdev', '添加设备',
+            [ {title:'MAC地址', field:'mac'}, {title:'名称', field:'name'} ],
+            []);
         $('#dev_config').ajaxOpwifiBind("{{ '/'.Request::path().'/update' }}", $table,
             'op_config', '绑定配置', '/m/webportal/config/select', 'name',
             'config_id');
+        $('#dev_user').ajaxOpwifiBind("{{ '/'.Request::path().'/update' }}", $table,
+            'op_devuser', '归属用户', '/m/system/user/select', 'username',
+            'device.mnger_id');
     });
 
     </script>

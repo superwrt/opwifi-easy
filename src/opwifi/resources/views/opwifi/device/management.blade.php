@@ -29,6 +29,9 @@
         <button id="dev_config" class="btn btn-default">
             <i class="glyphicon glyphicon-list-alt"></i> 配置
         </button>
+        <button id="dev_user" class="btn btn-default">
+            <i class="glyphicon glyphicon-user"></i> 用户
+        </button>
     </div>
 </div>
 <table id="devstable"
@@ -177,6 +180,9 @@
         $('#dev_config').ajaxOpwifiBind("{{ '/'.Request::path().'/update' }}", $table,
             'op_config', '同步配置', '/m/device/config/select', 'name',
             'op_config_id');
+        $('#dev_user').ajaxOpwifiBind("{{ '/'.Request::path().'/update' }}", $table,
+            'op_devuser', '归属用户', '/m/system/user/select', 'username',
+            'device.mnger_id');
     });
 
     </script>

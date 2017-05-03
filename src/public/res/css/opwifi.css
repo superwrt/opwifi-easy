@@ -222,8 +222,12 @@ ul#adminmenu .current a.menu-top:after, ul#adminmenu>li.current>a.current:after 
 }
 
 #adminmenu .ow-submenu .current {
+    background-color: #555;
+}
+
+#adminmenu .ow-submenu .current > a {
 	font-weight: 800;
-	color: #fff;
+	color: #eee;
 }
 
 #adminmenu .ow-submenu li > a{

@@ -59,7 +59,8 @@ class WebportalWebController extends Controller {
 					$pwd = md5("opwifi"+$input['password']);
 				}
 			}
-			if (!$user || $pwd != $user['shadow']) {
+			if (!$user || $pwd != $user['shadow'] ||
+					(($cfg['mnger_id'] > 0 || $user['mnger_id'] > 0) && $cfg['mnger_id'] != $user['mnger_id'])) {
 				$this->viewData['error']='用户不存在，或密码错误。';
 				return view("opwifi.webportal.web.login", array_merge($this->viewData,
 					['title' => $cfg['name'], 'mode' => $cfg['mode'], 'error' => '用户不存在，或密码错误。', 'from' => $input]));

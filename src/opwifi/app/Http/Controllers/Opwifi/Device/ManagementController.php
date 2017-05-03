@@ -19,8 +19,12 @@ class ManagementController extends OwCRUDController {
 	protected $viewData = array(
 	);
 
+	protected $limitUserId = 'mnger_id';
     protected $rootOwnModel = 'device';
     protected $indexOwnModel = 'mac';
+    protected function getOwnModelByRoot($dev) {
+    	return $dev->meta()->first();
+    }
     protected function newOwnModelRoot() {
     	return new OwDevices();
     }
@@ -80,6 +84,7 @@ class ManagementController extends OwCRUDController {
 	}
 
 	public function postRename(Request $request) {
+        $userId = $this->getLimitUserId();
 		$id = $request->get('id');
 		if (!$id) {
 			$id = $request->get('pk');
@@ -88,7 +93,7 @@ class ManagementController extends OwCRUDController {
 			$name = $request->get('name');
 		}
 		$meta = OwDevices::where('id', $id)->first();
-		if ($meta) {
+		if ($meta && !($userId > 0 && $meta->mnger_id != $userId)) {
 			$dev = $meta->device()->first();
 			if ($dev) {
 				$dev->update(['name'=>$name]);
@@ -102,12 +107,15 @@ class ManagementController extends OwCRUDController {
 		if (!$request->isJson()) {
 			return ;
 		}
+        $userId = $this->getLimitUserId();
 		$devs = $request->json()->all();
 		foreach ($devs as $dev) {
 			if (!$dev['id']) continue;
 			$d = OwDevices::where('id', $dev['id'])->first();
 			if ($d->count()) {
 				$m = $d->meta();
+                if ($userId > 0 && $m->mnger_id != $userId)
+                    continue;
 				if ($m->count()) {
 					$m->update(['op_reboot'=>true]);
 				}

@@ -192,7 +192,7 @@
             htmlForm.push('<form class="form-horizontal" method="post" id="'+
                 id+'" '+(typeof(apply)=='string'?'action="'+apply+'"':'')+'>');
             htmlForm.push('<select class="form-control input-md" name="'+bindField+'" placeholder="'+title+'" id="'+id+'_sel" >');
-            htmlForm.push('<option value="">无</option>');
+            htmlForm.push('<option value="">（无操作）</option>');
             for (var i in srcDat) {
                 var o = srcDat[i];
                 htmlForm.push('<option value="'+o.id+'" >'+o[dispField]+'</option>');

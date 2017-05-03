@@ -205,6 +205,7 @@ class WebportalServController extends Controller {
 
         $st = ['authed' => true, 'online' => true,
             'ondev' => $this->devMac, 'authdev_id' => $this->wpDev->id,
+            'mnger_id' => $this->wpDev->mnger_id,
             'config_id' => $this->wpConfig->id,
             'last_auth' => date("Y-m-d H:i:s",time()),
             'last_deadline' => date("Y-m-d H:i:s", time() + $tmout),
@@ -275,13 +276,14 @@ class WebportalServController extends Controller {
                 } else { /* Not authed device, maybe admin deauth it! */
                     $this->stationUnpermit($s['mac']);
                 }
-                if ($oldSt->ondev != $this->devMac) {
+                if ($oldSt->ondev != $this->devMac)
                     $st['ondev'] = $this->devMac;
-                }
+                if ($this->wpDev->mnger_id != $oldSt->mnger_id)
+                    $st['mnger_id'] = $this->wpDev->mnger_id;
 				$oldSt->update($st);
 			} else {
-				$oldSt = OwWebportalStationStatus::create(array_merge(
-					['mac'=>$s['mac'], 'ondev'=>$this->devMac], $st));
+				OwWebportalStationStatus::create(array_merge(
+					['mac'=>$s['mac'], 'ondev'=>$this->devMac, 'mnger_id' => $this->wpDev->mnger_id], $st));
 			}
 		}
 	}
@@ -339,7 +341,7 @@ class WebportalServController extends Controller {
 			$st['trx_used'] = isset($info['tx_used'])&&isset($info['rx_used'])?
                         $info['tx_used']+$info['rx_used']:0;
             $st['last_offline'] = date("Y-m-d H:i:s",time());
-            if ($info['authed']) {
+            if (isset($info['authed']) && $info['authed']) {
                 $calcSt = true;
             }
             break;
@@ -351,6 +353,7 @@ class WebportalServController extends Controller {
          */
 			$st['online'] = true;
             $st['ondev'] = $this->devMac;
+            $st['mnger_id'] = $this->wpDev->mnger_id;
 			if (isset($info['bssid'])) $st['bssid'] = $info['bssid'];
 			if (isset($info['ssid'])) $st['ssid'] = $info['ssid'];
             $st['last_online'] = date("Y-m-d H:i:s",time());

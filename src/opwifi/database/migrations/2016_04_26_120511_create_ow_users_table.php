@@ -18,7 +18,7 @@ class CreateOwUsersTable extends Migration
             $table->string('username',128)->unique()->index();
             $table->string('password',128);
             $table->string('email',128);
-            $table->string('right',256);
+            $table->string('right',256);//Support: admin, user, guest
             $table->string('timezone')->nullable();
             $table->rememberToken();
             $table->timestamps();
@@ -32,6 +32,6 @@ class CreateOwUsersTable extends Migration
      */
     public function down()
     {
-        Schema::drop('ow_users');
+        Schema::dropIfExists('ow_users');
     }
 }
