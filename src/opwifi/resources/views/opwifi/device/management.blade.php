@@ -182,7 +182,7 @@
             'op_config_id');
         $('#dev_user').ajaxOpwifiBind("{{ '/'.Request::path().'/update' }}", $table,
             'op_devuser', '归属用户', '/m/system/user/select', 'username',
-            'device.mnger_id');
+            'mnger_id');
     });
 
     </script>
