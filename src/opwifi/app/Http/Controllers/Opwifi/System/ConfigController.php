@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 
+use Auth;
+
 use App\Models\OwSystem;
 
 class ConfigController extends Controller {
@@ -28,7 +30,8 @@ class ConfigController extends Controller {
 	}
 
 	public function postIndex(Request $request) {
-        OwSystem::saveValues($request->only($this->config_items));
+        if (Auth::User()['right'] == 'admin')
+            OwSystem::saveValues($request->only($this->config_items));
         return $this->getIndex();
 	}
 
