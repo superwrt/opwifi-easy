@@ -233,7 +233,7 @@ include(base_path('resources/views/opwifi/common.php'));
   var config = {{ $config['config']?$config['config']:'{}' }};
   var pdata = <?php $config['pdata']?print($config['pdata']):print('{}'); ?>;
 
-  function load_vifs($t, data) {
+  function load_vifs(idx, $t, data) {
     $t.bootstrapTable({
             columns: [[
             {
@@ -286,8 +286,11 @@ include(base_path('resources/views/opwifi/common.php'));
               events: {
                 'click .edit': function (e, value, row, index) {
                   $.opwifi.rowOpwifiEdit(index, $t,
-                      'editcfg'+row.id, '修改'+row._v.name.v+'配置',[
+                      'editcfg'+idx+'_'+row.id, '修改'+row._v.name.v+'配置',[
                           {title:'开启', field:'_v.enable.v', type:'check'},
+                          {title:'模式', field:'mode', type:"select", opts: [
+                              {name: '接入点(AP)', value: 'ap'}
+                          ]},
                           {title:'SSID', field:'_v.ssid.v'},
                           {title:'隐藏', field:'_v.hidden.v', type:'check'},
                           {title:'认证', field:'_v.auth.v', type:"select", opts: [
@@ -295,11 +298,14 @@ include(base_path('resources/views/opwifi/common.php'));
                               {name: '加密 (WPA2-PSK)', value: 'wpa2-psk'}
                           ]},
                           {title:'密码', field:'_v.password.v'},
-                          {title:'VLAN', field:'_v.vlan.v'},
                           {title:'访客网络', field:'_v.guest.v', type:'check'},
                           {title:'隔离', field:'_v.isolate.v', type:'check'},
+                          {title:'无线桥接(WDS)', field:'_v.wds.v', type:'check'},
+                          {title:'终端均衡阈值', field:'_v.roaming_sense.v', type:'check'},
+                          {title:'终端漫游感知', field:'_v.balance_threshold.v'},
                           {title:'最大终端数', field:'_v.max_sta.v'},
                           {title:'接入信号门限', field:'_v.weak_signal.v', comment:'-30 ~ -90, dbm。'},
+                          {title:'VLAN', field:'_v.vlan.v'},
                       ],row);
                 },
                 'click .delete': function (e, value, row, index) {
@@ -366,9 +372,9 @@ include(base_path('resources/views/opwifi/common.php'));
           }
         }
       }
-      load_vifs($('#cf_wlan'+idx+'_vifs'), vs);
+      load_vifs(idx, $('#cf_wlan'+idx+'_vifs'), vs);
     } else {
-      load_vifs($('#cf_wlan'+idx+'_vifs'), []);
+      load_vifs(idx, $('#cf_wlan'+idx+'_vifs'), []);
     }
   }
 
