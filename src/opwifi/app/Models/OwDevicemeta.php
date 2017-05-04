@@ -25,5 +25,8 @@ class OwDevicemeta extends Model
         return $this->belongsTo('App\Models\OwDevConfigs', 'op_config_id');
     }
 
-
+    public function mnger()
+    {
+        return $this->belongsTo('App\Models\OwUsers', 'mnger_id');
+    }
 }

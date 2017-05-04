@@ -305,7 +305,7 @@ include(base_path('resources/views/opwifi/common.php'));
                           {title:'终端漫游感知', field:'_v.balance_threshold.v'},
                           {title:'最大终端数', field:'_v.max_sta.v'},
                           {title:'接入信号门限', field:'_v.weak_signal.v', comment:'-30 ~ -90, dbm。'},
-                          {title:'VLAN', field:'_v.vlan.v'},
+                          {title:'VLAN', field:'_v.vlan.v'}
                       ],row);
                 },
                 'click .delete': function (e, value, row, index) {

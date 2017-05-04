@@ -42,4 +42,28 @@ class OwUsers extends Model implements AuthenticatableContract,
         $this->attributes['password'] = bcrypt($value);
     }
 
+    public function deviceMeta()
+    {
+        return $this->hasMany('App\Models\OwDevicemeta', 'mnger_id');
+    }
+
+    public function deviceConfig()
+    {
+        return $this->hasMany('App\Models\OwDevConfigs', 'mnger_id');
+    }
+
+    public function deviceFirmware()
+    {
+        return $this->hasMany('App\Models\OwDevFirmwares', 'mnger_id');
+    }
+
+    public function webportalConfig()
+    {
+        return $this->hasMany('App\Models\OwWebportalConfigs', 'mnger_id');
+    }
+
+    public function webportalDevice()
+    {
+        return $this->hasMany('App\Models\OwWebportalDevices', 'mnger_id');
+    }
 }

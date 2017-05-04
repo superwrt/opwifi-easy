@@ -19,4 +19,9 @@ class OwWebportalDevices extends Model
     {
         return $this->belongsTo('App\Models\OwWebportalConfigs', 'config_id');
     }
+
+    public function mnger()
+    {
+        return $this->belongsTo('App\Models\OwUsers', 'mnger_id');
+    }
 }

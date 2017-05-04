@@ -8,11 +8,16 @@ class OwDevConfigs extends Model
 {
     protected $table = 'ow_dev_configs';
 
-    protected $fillable = ['name', 'comment', 'pdata', 'config'];
+    protected $fillable = ['name', 'comment', 'pdata', 'config', 'mnger_id'];
 
     public function devices()
     {
         return $this->hasMany('App\Models\OwDevicemeta', 'op_config_id');
+    }
+
+    public function mnger()
+    {
+        return $this->belongsTo('App\Models\OwUsers', 'mnger_id');
     }
 
     public function setConfigAttribute($value)
