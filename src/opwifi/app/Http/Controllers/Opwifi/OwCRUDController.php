@@ -119,10 +119,12 @@ abstract class OwCRUDController extends Controller
 				}
 			}
 			if (method_exists($this, 'createOwnModelRoot')) {
-				$this->createOwnModelRoot($cfg);
+				$new = $this->createOwnModelRoot($cfg);
 			} else {
-				$this->newOwnModelRoot()->create($cfg);
+				$new = $this->newOwnModelRoot()->create($cfg);
 			}
+			if ($userId > 0)
+				$this->getOwnModelByRoot($new)->update([$this->limitUserId => $userId]);
 		}
 		return response()->json(['success'=>true]);
 	}
