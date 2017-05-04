@@ -7,6 +7,8 @@ OpWiFi是由Terra针对[SuperWRT](http://superwrt.com)系统开发的设备管�
 
 OpWiFi是SuperWRT项目的一部分，官方网站是：[http://superwrt.com](http://superwrt.com)
 
+目前提供了一个低配置的虚拟主机(600M空间)作为演示用系统，地址为：[http://demo1.opwifi.com](http://demo1.opwifi.com) 。登录的用户名及密码都为：test。
+
 由于Terra对于PHP开发，也是边写边学，有问题的地方，欢迎指正。
 
 ##OpWiFi功能
