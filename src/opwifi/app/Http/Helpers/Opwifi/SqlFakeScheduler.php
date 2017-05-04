@@ -10,13 +10,14 @@ class SqlFakeScheduler
 
 	static public function getRules() {
 		return [
-        ['name'=>'owOutDevOnline', 'comment'=>'Update Online status', 'every'=>'10 MINUTE', 'sql'=>'
+        ['name'=>'owOutDevOnline', 'comment'=>'Update Online status', 'every'=>'10 MINUTE', 'start'=>'2000-01-01 02:30:00', 'sql'=>'
 UPDATE `ow_devicemeta` SET `online` =\'0\', `updated_at` = CURRENT_TIMESTAMP WHERE `online` =\'1\' AND TIMESTAMPDIFF(MINUTE, last_show, CURRENT_TIMESTAMP) > 20;
 UPDATE `ow_webportal_devices` SET `online` =\'0\', `updated_at` = CURRENT_TIMESTAMP WHERE `online` =\'1\' AND  TIMESTAMPDIFF(MINUTE, last_show, CURRENT_TIMESTAMP) > 10;
 '],
         ['name'=>'owCleaner', 'comment'=>'Clean unneed resource', 'every'=>'1 DAY', 'start'=>'2000-01-01 02:30:00', 'sql'=>'
 DELETE FROM `ow_webportal_tokens` WHERE TIMESTAMPDIFF(DAY, updated_at, CURRENT_TIMESTAMP) > 1;
-DELETE FROM `ow_webportal_station_status` WHERE TIMESTAMPDIFF(MONTH, updated_at, CURRENT_TIMESTAMP) > 1;
+DELETE FROM `ow_webportal_station_status` WHERE TIMESTAMPDIFF(MONTH, updated_at, CURRENT_TIMESTAMP) > 3;
+UPDATE `ow_webportal_station_status` SET `online` =\'0\', `updated_at` = CURRENT_TIMESTAMP WHERE `online` =\'1\' AND  TIMESTAMPDIFF(MINUTE, updated_at, CURRENT_TIMESTAMP) > 60;
 '],
     	];
 	}
