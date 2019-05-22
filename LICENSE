@@ -1,6 +1,6 @@
-                                 Apache License
-                           Version 2.0, January 2004
-                        http://www.apache.org/licenses/
+                                SuperWRT License
+                           Version 1.0, May 2019
+                        http://www.superwrt.org/licenses/
 
    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
@@ -120,6 +120,10 @@
           that such additional attribution notices cannot be construed
           as modifying the License.
 
+      (e) Any other recipients of the Work or Derivative Works don't allow
+          for mandatory open source. You can't use them into a project
+          using the license mandatory open source, like GPL series License.
+
       You may add Your own copyright statement to Your modifications and
       may provide additional or different license terms and conditions
       for use, reproduction, or distribution of Your modifications, or
@@ -175,9 +179,9 @@
 
    END OF TERMS AND CONDITIONS
 
-   APPENDIX: How to apply the Apache License to your work.
+   APPENDIX: How to apply the SuperWRT License to your work.
 
-      To apply the Apache License to your work, attach the following
+      To apply the SuperWRT License to your work, attach the following
       boilerplate notice, with the fields enclosed by brackets "{}"
       replaced with your own identifying information. (Don't include
       the brackets!)  The text should be enclosed in the appropriate
@@ -188,11 +192,11 @@
 
    Copyright {yyyy} {name of copyright owner}
 
-   Licensed under the Apache License, Version 2.0 (the "License");
+   Licensed under the SuperWRT License, Version 1.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+       http://www.superwrt.org/licenses/LICENSE-1.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,
